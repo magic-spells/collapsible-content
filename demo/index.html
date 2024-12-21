@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0" />
+		<title>Collapsible Component Demo</title>
+		<link rel="stylesheet" href="./collapsible-content.min.css" />
+		<style>
+			/* Basic styles for the demo */
+			body {
+				font-family: Helvetica, sans-serif;
+				line-height: 1.6;
+				margin: 20px;
+			}
+			h1 {
+				color: #333;
+			}
+			button {
+				cursor: pointer;
+				padding: 10px 15px;
+				background-color: #c3c3c3 !important;
+				color: #fff;
+				border: none;
+				font-size: 16px;
+				color: black;
+			}
+			button:hover {
+				background-color: #0056b3;
+			}
+
+			collapsible-component {
+				background-color: #f8f9fa;
+				border: 1px solid gray;
+				margin: 10px 0;
+			}
+
+			collapsible-content {
+				padding: 0px;
+				border: none;
+				border-radius: 4px;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			.content-wrapper {
+				padding: 10px 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Collapsible Component Demo</h1>
+
+		<!-- Example Collapsible Component -->
+		<collapsible-component>
+			<button aria-expanded="false">Product Information</button>
+			<collapsible-content hidden>
+				<div class="content-wrapper">
+					<h3>Details</h3>
+					<p>
+						This product is made with 100% organic materials. It's
+						durable, eco-friendly, and stylish.
+					</p>
+				</div>
+			</collapsible-content>
+		</collapsible-component>
+
+		<collapsible-component>
+			<button aria-expanded="false">Shipping Information</button>
+			<collapsible-content hidden>
+				<div class="content-wrapper">
+					<h3>Shipping</h3>
+					<p>
+						Free shipping on orders over $50. Orders are typically
+						processed within 1-2 business days.
+					</p>
+				</div>
+			</collapsible-content>
+		</collapsible-component>
+
+		<!-- Load the bundled script -->
+		<script src="./collapsible-content.js"></script>
+	</body>
+</html>

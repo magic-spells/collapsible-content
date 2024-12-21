@@ -1,0 +1,62 @@
+{
+	"name": "@magic-spells/collapsible-content",
+	"version": "0.1.0",
+	"description": "Collapsible content web component",
+	"author": "Cory Schulz",
+	"license": "MIT",
+	"type": "commonjs",
+	"main": "dist/collapsible-content.min.js",
+	"unpkg": "dist/collapsible-content.min.js",
+	"style": "dist/collapsible-content.min.css",
+	"sideEffects": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/magic-spells/collapsible-content"
+	},
+	"homepage": "https://github.com/magic-spells/collapsible-content#readme",
+	"bugs": {
+		"url": "https://github.com/magic-spells/collapsible-content/issues"
+	},
+	"keywords": [
+		"collapsible-content",
+		"web-components",
+		"accessibility",
+		"a11y",
+		"keyboard-navigation",
+		"custom-elements"
+	],
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"scripts": {
+		"build": "rollup -c",
+		"lint": "eslint src/ rollup.config.mjs",
+		"format": "prettier --write .",
+		"prepublishOnly": "npm run build",
+		"serve": "rollup -c --watch",
+		"dev": "rollup -c --watch"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"browserslist": [
+		"last 2 versions",
+		"not dead",
+		"not ie <= 11"
+	],
+	"devDependencies": {
+		"@eslint/js": "^8.57.0",
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-terser": "^0.4.4",
+		"eslint": "^8.0.0",
+		"globals": "^13.24.0",
+		"prettier": "^3.3.3",
+		"rollup": "^3.0.0",
+		"rollup-plugin-copy": "^3.5.0",
+		"rollup-plugin-postcss": "^4.0.2",
+		"rollup-plugin-serve": "^1.1.1",
+		"postcss-lightningcss": "^1.0.1"
+	}
+}
