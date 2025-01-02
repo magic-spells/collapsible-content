@@ -1,4 +1,4 @@
-import './styles.css';
+'use strict';
 
 class CollapsibleComponent extends HTMLElement {
 	#handleClick;
@@ -58,7 +58,7 @@ class CollapsibleContent extends HTMLElement {
 
 	set hidden(value) {
 		if (value) {
-			const height = this.scrollHeight;
+			this.scrollHeight;
 			this.offsetHeight;
 			this.style.height = '0';
 			this.setAttribute('aria-hidden', 'true');
@@ -83,4 +83,6 @@ class CollapsibleContent extends HTMLElement {
 customElements.define('collapsible-content', CollapsibleContent);
 customElements.define('collapsible-component', CollapsibleComponent);
 
-export { CollapsibleContent, CollapsibleComponent };
+exports.CollapsibleComponent = CollapsibleComponent;
+exports.CollapsibleContent = CollapsibleContent;
+//# sourceMappingURL=collapsible-content.cjs.js.map

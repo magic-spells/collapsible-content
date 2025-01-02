@@ -1,60 +1,96 @@
-import resolve from "@rollup/plugin-node-resolve";
-import terser from "@rollup/plugin-terser";
-import serve from "rollup-plugin-serve";
-import copy from "rollup-plugin-copy";
-import postcss from "rollup-plugin-postcss";
+import resolve from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
+import serve from 'rollup-plugin-serve';
+import copy from 'rollup-plugin-copy';
+import postcss from 'rollup-plugin-postcss';
 
 const dev = process.env.ROLLUP_WATCH;
 
+// Shared CSS plugin config to avoid duplicate processing
+const cssPlugin = postcss({
+	extract: 'collapsible-content.min.css',
+	minimize: true,
+});
+
 export default [
-	// Development build
+	// ESM build
 	{
-		input: "src/collapsible-content.js",
+		input: 'src/collapsible-content.js',
 		output: {
-			file: "dist/collapsible-content.js",
-			format: "iife",
-			sourcemap: dev,
+			file: 'dist/collapsible-content.esm.js',
+			format: 'es',
+			sourcemap: true,
 		},
-		plugins: [
-			resolve(),
-			postcss({
-				extract: "collapsible-content.min.css", // Extracts the CSS to a separate file
-				minimize: true,
-			}),
-			dev &&
-				serve({
-					contentBase: ["dist", "demo"],
-					open: true,
-					port: 3000,
-				}),
-			copy({
-				targets: [
-					{ src: "dist/collapsible-content.js", dest: "demo" },
-					{ src: "dist/collapsible-content.min.css", dest: "demo" },
-				],
-				hook: "writeBundle",
-			}),
-		],
+		plugins: [resolve(), cssPlugin],
 	},
-	// Production build (minified)
+	// CommonJS build
 	{
-		input: "src/collapsible-content.js",
+		input: 'src/collapsible-content.js',
 		output: {
-			file: "dist/collapsible-content.min.js",
-			format: "iife",
+			file: 'dist/collapsible-content.cjs.js',
+			format: 'cjs',
+			sourcemap: true,
+			exports: 'named',
+		},
+		plugins: [resolve(), cssPlugin],
+	},
+	// Minified IIFE for browsers
+	{
+		input: 'src/collapsible-content.js',
+		output: {
+			file: 'dist/collapsible-content.min.js',
+			format: 'iife',
+			name: 'CollapsibleContent',
 			sourcemap: false,
 		},
 		plugins: [
 			resolve(),
-			postcss({
-				extract: "dist/collapsible-content.min.css", // Minified CSS output
-				minimize: true,
-			}),
+			cssPlugin,
 			terser({
+				keep_classnames: true,
 				format: {
 					comments: false,
 				},
 			}),
 		],
 	},
+	// Development build
+	...(dev
+		? [
+				{
+					input: 'src/collapsible-content.js',
+					output: {
+						file: 'dist/collapsible-content.esm.js',
+						format: 'es',
+						sourcemap: true,
+					},
+					plugins: [
+						resolve(),
+						cssPlugin,
+						serve({
+							contentBase: ['dist', 'demo'],
+							open: true,
+							port: 3000,
+						}),
+						copy({
+							targets: [
+								{
+									src: 'dist/collapsible-content.esm.js',
+									dest: 'demo',
+								},
+								{
+									src: 'dist/collapsible-content.esm.js.map',
+									dest: 'demo',
+								},
+								{
+									src: 'dist/collapsible-content.min.css',
+									dest: 'demo',
+								},
+							],
+							hook: 'writeBundle',
+						}),
+					],
+				},
+			]
+		: []),
 ];

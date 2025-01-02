@@ -4,10 +4,19 @@
 	"description": "Collapsible content web component",
 	"author": "Cory Schulz",
 	"license": "MIT",
-	"type": "commonjs",
-	"main": "dist/collapsible-content.min.js",
+	"type": "module",
+	"main": "dist/collapsible-content.cjs.js",
+	"module": "dist/collapsible-content.esm.js",
 	"unpkg": "dist/collapsible-content.min.js",
 	"style": "dist/collapsible-content.min.css",
+	"exports": {
+		".": {
+			"import": "./dist/collapsible-content.esm.js",
+			"require": "./dist/collapsible-content.cjs.js",
+			"default": "./dist/collapsible-content.esm.js"
+		},
+		"./style.css": "./dist/collapsible-content.min.css"
+	},
 	"sideEffects": true,
 	"repository": {
 		"type": "git",
