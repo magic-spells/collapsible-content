@@ -56,8 +56,6 @@ class CollapsibleContent extends HTMLElement {
 
 	set hidden(value) {
 		if (value) {
-			this.scrollHeight;
-			this.offsetHeight;
 			this.style.height = '0';
 			this.setAttribute('aria-hidden', 'true');
 			this.setAttribute('inert', '');
