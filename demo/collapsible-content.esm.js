@@ -46,33 +46,58 @@ class CollapsibleComponent extends HTMLElement {
 class CollapsibleContent extends HTMLElement {
 	constructor() {
 		super();
+		this._onTransitionEnd = this._onTransitionEnd.bind(this);
+		// Add event listener to remove height after transition
+		this.addEventListener('transitionend', this._onTransitionEnd);
 	}
 
 	connectedCallback() {
 		if (this.hidden) {
 			this.style.height = '0';
+		} else {
+			this.style.height = `${this.scrollHeight}px`;
 		}
 	}
 
+	disconnectedCallback() {
+		this.removeEventListener('transitionend', this._onTransitionEnd);
+	}
+
 	set hidden(value) {
+		// animate to closed
 		if (value) {
-			this.style.height = '0';
+			// reset height to animate from
+			this.style.height = `${this.scrollHeight}px`;
+
+			// wait one frame and animate to 0
+			requestAnimationFrame(() => {
+				this.style.height = '0px';
+			});
+
 			this.setAttribute('aria-hidden', 'true');
 			this.setAttribute('inert', '');
+			this.setAttribute('hidden', '');
 		} else {
+			// animate to open
 			this.style.height = `${this.scrollHeight}px`;
 			this.removeAttribute('aria-hidden');
 			this.removeAttribute('inert');
-		}
-		if (value) {
-			this.setAttribute('hidden', '');
-		} else {
 			this.removeAttribute('hidden');
 		}
 	}
 
 	get hidden() {
 		return this.hasAttribute('hidden');
+	}
+
+	_onTransitionEnd(event) {
+		// exit if isn't height property
+		if (event.propertyName != 'height') return;
+
+		// Remove the inline height to allow dynamic content changes
+		if (!this.hidden) {
+			this.style.height = 'auto';
+		}
 	}
 }
 
