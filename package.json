@@ -1,6 +1,6 @@
 {
 	"name": "@magic-spells/collapsible-content",
-	"version": "0.1.0",
+	"version": "0.1.2",
 	"description": "Collapsible content web component",
 	"author": "Cory Schulz",
 	"license": "MIT",

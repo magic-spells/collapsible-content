@@ -16,3 +16,7 @@ collapsible-content {
 	overflow: hidden;
 	transition: height 0.35s ease-out;
 }
+
+collapsible-component collapsible-content[hidden] {
+	display: block;
+}

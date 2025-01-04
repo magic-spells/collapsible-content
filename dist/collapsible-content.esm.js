@@ -68,11 +68,10 @@ class CollapsibleContent extends HTMLElement {
 		if (value) {
 			// reset height to animate from
 			this.style.height = `${this.scrollHeight}px`;
-
 			// wait one frame and animate to 0
-			requestAnimationFrame(() => {
+			setTimeout(() => {
 				this.style.height = '0px';
-			});
+			}, 1);
 
 			this.setAttribute('aria-hidden', 'true');
 			this.setAttribute('inert', '');
