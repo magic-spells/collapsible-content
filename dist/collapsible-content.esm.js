@@ -3,7 +3,8 @@ class CollapsibleComponent extends HTMLElement {
 
 	constructor() {
 		super();
-		this.#handleClick = () => {
+		this.#handleClick = (e) => {
+			e.preventDefault();
 			const button = this.querySelector('button');
 			const content = this.querySelector('collapsible-content');
 			const expanded =
