@@ -33,7 +33,7 @@ class CollapsibleComponent extends HTMLElement {
 	 */
 	connectedCallback() {
 		const _ = this;
-		
+
 		// initialize element references once
 		_.button = _.querySelector('button');
 		_.content = _.querySelector('collapsible-content');
@@ -108,7 +108,7 @@ class CollapsibleContent extends HTMLElement {
 	 */
 	connectedCallback() {
 		const _ = this;
-		
+
 		// get aria-expanded state from button
 		const component = _.closest('collapsible-component');
 		const button = component.querySelector('button');
@@ -136,7 +136,7 @@ class CollapsibleContent extends HTMLElement {
 	 */
 	set hidden(value) {
 		const _ = this;
-		
+
 		// animate to closed
 		if (value) {
 			// reset height to animate from
