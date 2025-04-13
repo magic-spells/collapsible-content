@@ -1,0 +1,25 @@
+// Import variables using the modern @use rule
+@use 'variables' as vars;
+
+collapsible-component {
+  display: var(--cc-component-display, block);
+  
+  button {
+    width: var(--cc-button-width, 100%);
+    text-align: var(--cc-button-text-align, left);
+    background: var(--cc-button-background, none);
+    border: var(--cc-button-border, none);
+    cursor: var(--cc-button-cursor, pointer);
+  }
+  
+  collapsible-content[hidden] {
+    display: var(--cc-content-display, block);
+  }
+}
+
+collapsible-content {
+  padding: var(--cc-content-padding, 0px);
+  display: var(--cc-content-display, block);
+  overflow: var(--cc-content-overflow, hidden);
+  transition: height var(--cc-transition-duration, 0.35s) var(--cc-transition-timing, ease-out);
+}

@@ -1,6 +1,6 @@
 {
 	"name": "@magic-spells/collapsible-content",
-	"version": "0.1.4",
+	"version": "0.2.0",
 	"description": "Collapsible content web component",
 	"author": "Cory Schulz",
 	"license": "MIT",
@@ -9,13 +9,17 @@
 	"module": "dist/collapsible-content.esm.js",
 	"unpkg": "dist/collapsible-content.min.js",
 	"style": "dist/collapsible-content.min.css",
+	"sass": "dist/collapsible-content.scss",
 	"exports": {
 		".": {
 			"import": "./dist/collapsible-content.esm.js",
 			"require": "./dist/collapsible-content.cjs.js",
 			"default": "./dist/collapsible-content.esm.js"
 		},
-		"./style.css": "./dist/collapsible-content.min.css"
+		"./css": "./dist/collapsible-content.css",
+		"./css/min": "./dist/collapsible-content.min.css",
+		"./scss": "./dist/collapsible-content.scss",
+		"./scss/*": "./dist/scss/*"
 	},
 	"sideEffects": true,
 	"repository": {
@@ -61,11 +65,12 @@
 		"@rollup/plugin-terser": "^0.4.4",
 		"eslint": "^8.0.0",
 		"globals": "^13.24.0",
+		"postcss-lightningcss": "^1.0.1",
 		"prettier": "^3.3.3",
 		"rollup": "^3.0.0",
 		"rollup-plugin-copy": "^3.5.0",
 		"rollup-plugin-postcss": "^4.0.2",
 		"rollup-plugin-serve": "^1.1.1",
-		"postcss-lightningcss": "^1.0.1"
+		"sass": "^1.86.3"
 	}
 }

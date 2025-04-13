@@ -1,172 +1,177 @@
-import './styles.css';
+import './index.scss';
 
 /**
- * custom element that creates a collapsible/expandable component with proper accessibility
+ * Custom element that creates a collapsible/expandable component with proper accessibility
  */
 class CollapsibleComponent extends HTMLElement {
 	#handleClick;
 
 	/**
-	 * initializes the component and sets up references to child elements
+	 * Initializes the component and sets up references to child elements
 	 */
 	constructor() {
 		super();
+		const _ = this;
 
 		// store references to elements once to avoid re-querying
-		this.button = null;
-		this.content = null;
+		_.button = null;
+		_.content = null;
 
 		// define click handler with proper this binding
-		this.#handleClick = (e) => {
+		_.#handleClick = (e) => {
 			e.preventDefault();
 			// toggle expanded value
-			const expanded = this.button.getAttribute('aria-expanded') !== 'true';
-			this.button.setAttribute('aria-expanded', expanded);
-			this.content.hidden = !expanded;
+			const expanded = _.button.getAttribute('aria-expanded') !== 'true';
+			_.button.setAttribute('aria-expanded', expanded);
+			_.content.hidden = !expanded;
 		};
 	}
 
 	/**
-	 * called when element is added to the dom
-	 * sets up accessibility attributes and event listeners
+	 * Called when element is added to the DOM
+	 * Sets up accessibility attributes and event listeners
 	 */
 	connectedCallback() {
-		// initialize element references once
-		this.button = this.querySelector('button');
-		this.content = this.querySelector('collapsible-content');
+		const _ = this;
 
-		if (!this.button || !this.content) {
+		// initialize element references once
+		_.button = _.querySelector('button');
+		_.content = _.querySelector('collapsible-content');
+
+		if (!_.button || !_.content) {
 			console.error('CollapsibleComponent requires a <button> and a <collapsible-content>.');
 			return;
 		}
 
 		// generate ids if not provided
-		this.button.id ||= `collapsible-button-${crypto.randomUUID().slice(0, 8)}`;
-		this.content.id ||= `collapsible-content-${crypto.randomUUID().slice(0, 8)}`;
+		_.button.id ||= `collapsible-button-${crypto.randomUUID().slice(0, 8)}`;
+		_.content.id ||= `collapsible-content-${crypto.randomUUID().slice(0, 8)}`;
 
 		// set accessibility attributes
-		this.button.setAttribute('aria-controls', this.content.id);
-		this.content.setAttribute('role', 'region');
-		this.content.setAttribute('aria-labelledby', this.button.id);
+		_.button.setAttribute('aria-controls', _.content.id);
+		_.content.setAttribute('role', 'region');
+		_.content.setAttribute('aria-labelledby', _.button.id);
 
 		// set initial state based on aria-expanded attribute
-		const expanded = this.button.getAttribute('aria-expanded') === 'true';
+		const expanded = _.button.getAttribute('aria-expanded') === 'true';
 
-		// make shure content state matches button state
-		this.content.hidden = !expanded;
+		// make sure content state matches button state
+		_.content.hidden = !expanded;
 
 		// add event listener
-		this.button.addEventListener('click', this.#handleClick);
+		_.button.addEventListener('click', _.#handleClick);
 	}
 
 	/**
-	 * called when element is removed from the dom
-	 * cleans up event listeners
+	 * Called when element is removed from the DOM
+	 * Cleans up event listeners
 	 */
 	disconnectedCallback() {
-		if (this.button) {
-			this.button.removeEventListener('click', this.#handleClick);
+		const _ = this;
+		if (_.button) {
+			_.button.removeEventListener('click', _.#handleClick);
 		}
 	}
 }
 
 /**
- * custom element that provides animated collapsible content
+ * Custom element that provides animated collapsible content
  */
 class CollapsibleContent extends HTMLElement {
+	#handleTransitionEnd;
+
 	/**
-	 * initializes the content element and binds event handlers
+	 * Initializes the content element and binds event handlers
 	 */
 	constructor() {
 		super();
+		const _ = this;
 
-		// bind event handler to this instance
-		this._onTransitionEnd = this._onTransitionEnd.bind(this);
+		// define event handler using arrow function for proper binding
+		_.#handleTransitionEnd = (event) => {
+			// exit if isn't height property
+			if (event.propertyName != 'height') return;
+
+			// remove the inline height to allow dynamic content changes
+			if (!_.hidden) {
+				_.style.height = 'auto';
+			}
+		};
 
 		// add event listener to remove height after transition
-		this.addEventListener('transitionend', this._onTransitionEnd);
+		_.addEventListener('transitionend', _.#handleTransitionEnd);
 	}
 
 	/**
-	 * called when element is added to the dom
-	 * sets initial height based on hidden state
+	 * Called when element is added to the DOM
+	 * Sets initial height based on hidden state
 	 */
 	connectedCallback() {
-		// get aria-expanded state from buton
-		const component = this.closest('collapsible-component');
+		const _ = this;
+
+		// get aria-expanded state from button
+		const component = _.closest('collapsible-component');
 		const button = component.querySelector('button');
 		const expanded = button.getAttribute('aria-expanded') === 'true';
 
 		if (expanded) {
-			this.style.height = 'auto';
+			_.style.height = 'auto';
 		} else {
-			this.style.height = '0';
+			_.style.height = '0';
 		}
 	}
 
 	/**
-	 * called when element is removed from the dom
-	 * cleans up event listeners
+	 * Called when element is removed from the DOM
+	 * Cleans up event listeners
 	 */
 	disconnectedCallback() {
-		this.removeEventListener('transitionend', this._onTransitionEnd);
+		const _ = this;
+		_.removeEventListener('transitionend', _.#handleTransitionEnd);
 	}
 
 	/**
-	 * handles setting the hidden attribute with animation
-	 * @param {boolean} value - whether element should be hidden
+	 * Handles setting the hidden attribute with animation
+	 * @param {boolean} value - Whether element should be hidden
 	 */
 	set hidden(value) {
+		const _ = this;
+
 		// animate to closed
 		if (value) {
 			// reset height to animate from
-			this.style.height = `${this.scrollHeight}px`;
+			_.style.height = `${_.scrollHeight}px`;
 
 			// wait one frame and animate to 0
 			setTimeout(() => {
-				this.style.height = '0px';
+				_.style.height = '0px';
 			}, 1);
 
 			// set accessibility attributes
-			this.setAttribute('aria-hidden', 'true');
-			this.setAttribute('inert', '');
-			this.setAttribute('hidden', '');
+			_.setAttribute('aria-hidden', 'true');
+			_.setAttribute('inert', '');
+			_.setAttribute('hidden', '');
 		} else {
 			// only animate if not set to auto
-			if (this.style.height !== 'auto') {
+			if (_.style.height !== 'auto') {
 				// animate to open
-				this.style.height = `${this.scrollHeight}px`;
+				_.style.height = `${_.scrollHeight}px`;
 			}
 
 			// remove accessibility attributes
-			this.removeAttribute('aria-hidden');
-			this.removeAttribute('inert');
-			this.removeAttribute('hidden');
+			_.removeAttribute('aria-hidden');
+			_.removeAttribute('inert');
+			_.removeAttribute('hidden');
 		}
 	}
 
 	/**
-	 * gets the hidden state from the attribute
-	 * @return {boolean} whether element is hidden
+	 * Gets the hidden state from the attribute
+	 * @returns {boolean} Whether element is hidden
 	 */
 	get hidden() {
-		return this.hasAttribute('hidden');
-	}
-
-	/**
-	 * handles the end of css transitions
-	 * @param {TransitionEvent} event - the transition event
-	 */
-	_onTransitionEnd(event) {
-		console.log('on transition end');
-
-		// exit if isn't height property
-		if (event.propertyName != 'height') return;
-
-		// remove the inline height to allow dynamic content changes
-		if (!this.hidden) {
-			this.style.height = 'auto';
-		}
+		const _ = this;
+		return _.hasAttribute('hidden');
 	}
 }
 
