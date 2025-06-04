@@ -113,9 +113,13 @@
 		connectedCallback() {
 			const _ = this;
 
-			// get aria-expanded state from button
-			const component = _.closest('collapsible-component');
-			const button = component.querySelector('button');
+	                // get aria-expanded state from button
+	                const component = _.closest('collapsible-component');
+	                if (!component) {
+	                        console.error('<collapsible-content> requires a parent <collapsible-component>.');
+	                        return;
+	                }
+	                const button = component.querySelector('button');
 			const expanded = button.getAttribute('aria-expanded') === 'true';
 
 			if (expanded) {
