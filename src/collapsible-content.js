@@ -143,9 +143,9 @@ class CollapsibleContent extends HTMLElement {
 			_.style.height = `${_.scrollHeight}px`;
 
 			// wait one frame and animate to 0
-			setTimeout(() => {
+			requestAnimationFrame(() => {
 				_.style.height = '0px';
-			}, 1);
+			});
 
 			// set accessibility attributes
 			_.setAttribute('aria-hidden', 'true');
