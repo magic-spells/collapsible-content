@@ -1,6 +1,6 @@
 {
 	"name": "@magic-spells/collapsible-content",
-	"version": "0.2.0",
+	"version": "1.0.0",
 	"description": "Collapsible content web component",
 	"author": "Cory Schulz",
 	"license": "MIT",
@@ -67,7 +67,6 @@
 		"rollup": "^3.0.0",
 		"rollup-plugin-copy": "^3.5.0",
 		"rollup-plugin-postcss": "^4.0.2",
-		"rollup-plugin-serve": "^1.1.1",
-		"sass": "^1.86.3"
+		"rollup-plugin-serve": "^1.1.1"
 	}
 }
