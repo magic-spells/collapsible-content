@@ -23,7 +23,7 @@ class CollapsibleComponent extends HTMLElement {
 			// toggle expanded value
 			const expanded = _.button.getAttribute('aria-expanded') !== 'true';
 			_.button.setAttribute('aria-expanded', expanded);
-			_.content.hidden = !expanded;
+			_.content.collapsed = !expanded;
 		};
 	}
 
@@ -52,11 +52,10 @@ class CollapsibleComponent extends HTMLElement {
 		_.content.setAttribute('role', 'region');
 		_.content.setAttribute('aria-labelledby', _.button.id);
 
-		// set initial state based on aria-expanded attribute
-		const expanded = _.button.getAttribute('aria-expanded') === 'true';
-
-		// make sure content state matches button state
-		_.content.hidden = !expanded;
+		// set initial state based on open attribute
+		const open = _.content.hasAttribute('open');
+		_.button.setAttribute('aria-expanded', open);
+		_.content.collapsed = !open;
 
 		// add event listener
 		_.button.addEventListener('click', _.#handleClick);
@@ -93,7 +92,7 @@ class CollapsibleContent extends HTMLElement {
 			if (event.propertyName != 'height') return;
 
 			// remove the inline height to allow dynamic content changes
-			if (!_.hidden) {
+			if (!_.collapsed) {
 				_.style.height = 'auto';
 			}
 		};
@@ -104,21 +103,11 @@ class CollapsibleContent extends HTMLElement {
 
 	/**
 	 * Called when element is added to the DOM
-	 * Sets initial height based on hidden state
+	 * Sets initial height based on open attribute
 	 */
 	connectedCallback() {
 		const _ = this;
-
-		// get aria-expanded state from button
-		const component = _.closest('collapsible-component');
-		const button = component.querySelector('button');
-		const expanded = button.getAttribute('aria-expanded') === 'true';
-
-		if (expanded) {
-			_.style.height = 'auto';
-		} else {
-			_.style.height = '0';
-		}
+		_.style.height = _.hasAttribute('open') ? 'auto' : '0';
 	}
 
 	/**
@@ -131,15 +120,14 @@ class CollapsibleContent extends HTMLElement {
 	}
 
 	/**
-	 * Handles setting the hidden attribute with animation
-	 * @param {boolean} value - Whether element should be hidden
+	 * Handles setting the collapsed state with animation
+	 * @param {boolean} value - Whether element should be collapsed
 	 */
-	set hidden(value) {
+	set collapsed(value) {
 		const _ = this;
 
-		// animate to closed
 		if (value) {
-			// reset height to animate from
+			// animate to closed
 			_.style.height = `${_.scrollHeight}px`;
 
 			// wait one frame and animate to 0
@@ -147,31 +135,27 @@ class CollapsibleContent extends HTMLElement {
 				_.style.height = '0px';
 			}, 1);
 
-			// set accessibility attributes
+			_.removeAttribute('open');
 			_.setAttribute('aria-hidden', 'true');
 			_.setAttribute('inert', '');
-			_.setAttribute('hidden', '');
 		} else {
-			// only animate if not set to auto
+			// animate to open if not already auto
 			if (_.style.height !== 'auto') {
-				// animate to open
 				_.style.height = `${_.scrollHeight}px`;
 			}
 
-			// remove accessibility attributes
+			_.setAttribute('open', '');
 			_.removeAttribute('aria-hidden');
 			_.removeAttribute('inert');
-			_.removeAttribute('hidden');
 		}
 	}
 
 	/**
-	 * Gets the hidden state from the attribute
-	 * @returns {boolean} Whether element is hidden
+	 * Gets the collapsed state
+	 * @returns {boolean} Whether element is collapsed
 	 */
-	get hidden() {
-		const _ = this;
-		return _.hasAttribute('hidden');
+	get collapsed() {
+		return !this.hasAttribute('open');
 	}
 }
 
