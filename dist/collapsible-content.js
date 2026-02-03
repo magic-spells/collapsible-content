@@ -62,8 +62,8 @@
 			_.content.id ||= `collapsible-content-${crypto.randomUUID().slice(0, 8)}`;
 
 			// set accessibility attributes
+			_.button.type ||= 'button';
 			_.button.setAttribute('aria-controls', _.content.id);
-			_.content.setAttribute('role', 'region');
 			_.content.setAttribute('aria-labelledby', _.button.id);
 
 			// set initial state based on open attribute

@@ -33,7 +33,7 @@ Or include directly in your HTML:
 
 ```html
 <collapsible-component>
-  <button>Product Information</button>
+  <button type="button">Product Information</button>
   <collapsible-content>
     <div class="content-wrapper">
       <h3>Details</h3>
@@ -49,7 +49,7 @@ Add the `open` attribute to start with content visible:
 
 ```html
 <collapsible-component>
-  <button>Already Open</button>
+  <button type="button">Already Open</button>
   <collapsible-content open>
     <p>This content is visible by default.</p>
   </collapsible-content>
