@@ -153,11 +153,12 @@ class CollapsibleContent extends HTMLElement {
 
 		// check if transitions are enabled (respects prefers-reduced-motion)
 		const hasTransition = getComputedStyle(_).transitionDuration !== '0s';
-		if (hasTransition) {
-			_.#animating = true;
-		}
 
 		if (value) {
+			if (hasTransition) {
+				_.#animating = true;
+			}
+
 			// animate to closed
 			_.style.height = `${_.scrollHeight}px`;
 
@@ -172,8 +173,11 @@ class CollapsibleContent extends HTMLElement {
 			_.setAttribute('aria-hidden', 'true');
 			_.setAttribute('inert', '');
 		} else {
-			// animate to open if not already auto
+			// only animate if not already auto
 			if (_.style.height !== 'auto') {
+				if (hasTransition) {
+					_.#animating = true;
+				}
 				_.style.height = `${_.scrollHeight}px`;
 			}
 
