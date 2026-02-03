@@ -1,6 +1,6 @@
 # Collapsible Content Web Component
 
-A lightweight, customizable Web Component for creating accessible collapsible content sections. Perfect for FAQs, accordions, or any content that needs to be toggled.
+A lightweight, accessible Web Component for creating collapsible content sections. Perfect for FAQs, accordions, or any content that needs to be toggled.
 
 [**Live Demo**](https://magic-spells.github.io/collapsible-content/demo/)
 
@@ -8,10 +8,10 @@ A lightweight, customizable Web Component for creating accessible collapsible co
 
 - No dependencies
 - Lightweight
-- Follows accessibility best practices
-- Smooth open/close animations
-- Uses proper ARIA attributes
-- Keyboard accessible
+- Accessible (ARIA attributes, keyboard support, focus management)
+- Smooth animations with `prefers-reduced-motion` support
+- Prevents rapid click issues during animation
+- Safe to import multiple times (no double-registration errors)
 
 ## Installation
 
@@ -20,7 +20,6 @@ npm install @magic-spells/collapsible-content
 ```
 
 ```javascript
-// Add to your JavaScript file
 import '@magic-spells/collapsible-content';
 ```
 
@@ -34,85 +33,83 @@ Or include directly in your HTML:
 
 ```html
 <collapsible-component>
-  <button aria-expanded="false">Product Information</button>
+  <button>Product Information</button>
   <collapsible-content>
     <div class="content-wrapper">
       <h3>Details</h3>
-      <p>
-        This product is made with 100% organic materials. It's durable, eco-friendly, and
-        stylish.
-      </p>
+      <p>This product is made with 100% organic materials.</p>
     </div>
   </collapsible-content>
 </collapsible-component>
 ```
 
-## How It Works
+### Start Expanded
 
-- The collapsible content is initially hidden (unless `aria-expanded="true"` is set on the button)
-- Clicking the button toggles the visibility of the content
-- The component handles all the ARIA attributes for accessibility
-- Smooth animations are provided for opening and closing
+Add the `open` attribute to start with content visible:
+
+```html
+<collapsible-component>
+  <button>Already Open</button>
+  <collapsible-content open>
+    <p>This content is visible by default.</p>
+  </collapsible-content>
+</collapsible-component>
+```
 
 ## Customization
 
-### Styling
-
-You can style the collapsible component using CSS custom properties:
+Customize the animation with CSS custom properties:
 
 ```css
-:root {
-  /* Layout */
-  --cc-component-display: block;
-  --cc-button-width: 100%;
-  --cc-button-text-align: left;
-  
-  /* Appearance */
-  --cc-button-background: none;
-  --cc-button-border: none;
-  --cc-button-cursor: pointer;
-  
-  /* Animation */
-  --cc-content-padding: 10px;
-  --cc-transition-duration: 0.5s;
-  --cc-transition-timing: ease-in-out;
+collapsible-content {
+  --collapsible-duration: 0.5s;
+  --collapsible-easing: ease-in-out;
 }
 ```
 
-### SCSS Integration
+| Property | Default | Description |
+|----------|---------|-------------|
+| `--collapsible-duration` | `0.35s` | Animation duration |
+| `--collapsible-easing` | `ease-out` | Animation timing function |
 
-For more advanced customization, you can import the SCSS directly:
+## Events
 
-```scss
-// Option 1: Import the compiled CSS
-@import '@magic-spells/collapsible-content/css';
+### collapsible-error
 
-// Option 2: Import the SCSS and override variables
-@use '@magic-spells/collapsible-content/scss' with (
-  $transition-duration: 0.5s,
-  $transition-timing: ease-in-out,
-  $content-padding: 10px
-);
+Fired when the component is missing required children:
 
-// Option 3: Import specific parts
-@use '@magic-spells/collapsible-content/scss/variables' with (
-  $button-text-align: center
-);
-@use '@magic-spells/collapsible-content/scss/collapsible-content';
+```javascript
+document.addEventListener('collapsible-error', (e) => {
+  console.error('Collapsible setup failed:', e.detail.error);
+});
+```
+
+## Programmatic Control
+
+Access the `collapsed` property on the `<collapsible-content>` element:
+
+```javascript
+const content = document.querySelector('collapsible-content');
+content.collapsed = true;  // collapse
+content.collapsed = false; // expand
+console.log(content.collapsed); // get current state
 ```
 
 ## Accessibility
 
-This component follows WCAG guidelines for accessible accordions:
+This component follows WCAG guidelines:
 
-- Uses proper `aria-expanded` and `aria-controls` attributes
-- Content regions have proper `role="region"` and `aria-labelledby` attributes
-- Keyboard accessible (toggle with Space or Enter key)
-- Focus management for keyboard users
+- `aria-expanded` on button indicates current state
+- `aria-controls` links button to content
+- `role="region"` and `aria-labelledby` on content
+- `aria-hidden` and `inert` when collapsed
+- Keyboard accessible (Space/Enter to toggle)
+- Focus-visible styling for keyboard users
+- Respects `prefers-reduced-motion`
 
 ## Browser Support
 
-This component works in all modern browsers that support Web Components.
+Modern browsers with Web Components support (Chrome, Firefox, Safari, Edge).
 
 ## License
 

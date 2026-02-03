@@ -192,9 +192,13 @@ class CollapsibleContent extends HTMLElement {
 	}
 }
 
-// register custom elements
-customElements.define('collapsible-content', CollapsibleContent);
-customElements.define('collapsible-component', CollapsibleComponent);
+// register custom elements if not already defined
+if (!customElements.get('collapsible-content')) {
+	customElements.define('collapsible-content', CollapsibleContent);
+}
+if (!customElements.get('collapsible-component')) {
+	customElements.define('collapsible-component', CollapsibleComponent);
+}
 
 export { CollapsibleComponent, CollapsibleContent };
 //# sourceMappingURL=collapsible-content.esm.js.map
