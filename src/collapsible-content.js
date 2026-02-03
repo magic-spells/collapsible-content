@@ -5,6 +5,7 @@ import './collapsible-content.css';
  */
 class CollapsibleComponent extends HTMLElement {
 	#handleClick;
+	#abortController;
 
 	/**
 	 * Initializes the component and sets up references to child elements
@@ -39,7 +40,16 @@ class CollapsibleComponent extends HTMLElement {
 		_.content = _.querySelector('collapsible-content');
 
 		if (!_.button || !_.content) {
-			console.error('CollapsibleComponent requires a <button> and a <collapsible-content>.');
+			const error = new Error(
+				'CollapsibleComponent requires a <button> and a <collapsible-content>.'
+			);
+			console.error(error.message);
+			_.dispatchEvent(
+				new CustomEvent('collapsible-error', {
+					bubbles: true,
+					detail: { error },
+				})
+			);
 			return;
 		}
 
@@ -57,8 +67,11 @@ class CollapsibleComponent extends HTMLElement {
 		_.button.setAttribute('aria-expanded', open);
 		_.content.collapsed = !open;
 
-		// add event listener
-		_.button.addEventListener('click', _.#handleClick);
+		// use AbortController to prevent duplicate listeners on reconnection
+		_.#abortController = new AbortController();
+		_.button.addEventListener('click', _.#handleClick, {
+			signal: _.#abortController.signal,
+		});
 	}
 
 	/**
@@ -67,8 +80,9 @@ class CollapsibleComponent extends HTMLElement {
 	 */
 	disconnectedCallback() {
 		const _ = this;
-		if (_.button) {
-			_.button.removeEventListener('click', _.#handleClick);
+		if (_.#abortController) {
+			_.#abortController.abort();
+			_.#abortController = null;
 		}
 	}
 }
@@ -78,6 +92,8 @@ class CollapsibleComponent extends HTMLElement {
  */
 class CollapsibleContent extends HTMLElement {
 	#handleTransitionEnd;
+	#abortController;
+	#animating = false;
 
 	/**
 	 * Initializes the content element and binds event handlers
@@ -89,16 +105,15 @@ class CollapsibleContent extends HTMLElement {
 		// define event handler using arrow function for proper binding
 		_.#handleTransitionEnd = (event) => {
 			// exit if isn't height property
-			if (event.propertyName != 'height') return;
+			if (event.propertyName !== 'height') return;
+
+			_.#animating = false;
 
 			// remove the inline height to allow dynamic content changes
 			if (!_.collapsed) {
 				_.style.height = 'auto';
 			}
 		};
-
-		// add event listener to remove height after transition
-		_.addEventListener('transitionend', _.#handleTransitionEnd);
 	}
 
 	/**
@@ -108,6 +123,12 @@ class CollapsibleContent extends HTMLElement {
 	connectedCallback() {
 		const _ = this;
 		_.style.height = _.hasAttribute('open') ? 'auto' : '0';
+
+		// use AbortController to prevent duplicate listeners on reconnection
+		_.#abortController = new AbortController();
+		_.addEventListener('transitionend', _.#handleTransitionEnd, {
+			signal: _.#abortController.signal,
+		});
 	}
 
 	/**
@@ -116,7 +137,10 @@ class CollapsibleContent extends HTMLElement {
 	 */
 	disconnectedCallback() {
 		const _ = this;
-		_.removeEventListener('transitionend', _.#handleTransitionEnd);
+		if (_.#abortController) {
+			_.#abortController.abort();
+			_.#abortController = null;
+		}
 	}
 
 	/**
@@ -126,14 +150,25 @@ class CollapsibleContent extends HTMLElement {
 	set collapsed(value) {
 		const _ = this;
 
+		// prevent rapid clicking during animation
+		if (_.#animating) return;
+
+		// check if transitions are enabled (respects prefers-reduced-motion)
+		const hasTransition = getComputedStyle(_).transitionDuration !== '0s';
+		if (hasTransition) {
+			_.#animating = true;
+		}
+
 		if (value) {
 			// animate to closed
 			_.style.height = `${_.scrollHeight}px`;
 
-			// wait one frame and animate to 0
-			setTimeout(() => {
-				_.style.height = '0px';
-			}, 1);
+			// use requestAnimationFrame for reliable frame timing
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					_.style.height = '0px';
+				});
+			});
 
 			_.removeAttribute('open');
 			_.setAttribute('aria-hidden', 'true');

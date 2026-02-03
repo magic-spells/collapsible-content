@@ -9,7 +9,6 @@
 	"module": "dist/collapsible-content.esm.js",
 	"unpkg": "dist/collapsible-content.min.js",
 	"style": "dist/collapsible-content.min.css",
-	"sass": "dist/collapsible-content.scss",
 	"exports": {
 		".": {
 			"import": "./dist/collapsible-content.esm.js",
@@ -17,9 +16,7 @@
 			"default": "./dist/collapsible-content.esm.js"
 		},
 		"./css": "./dist/collapsible-content.css",
-		"./css/min": "./dist/collapsible-content.min.css",
-		"./scss": "./dist/collapsible-content.scss",
-		"./scss/*": "./dist/scss/*"
+		"./css/min": "./dist/collapsible-content.min.css"
 	},
 	"sideEffects": true,
 	"repository": {
