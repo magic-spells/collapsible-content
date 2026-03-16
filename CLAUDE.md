@@ -34,8 +34,17 @@ npm run format   # Prettier
 
 - Duration is dynamic: calculated from content height and `speed` attribute (px/sec)
 - Default speed: `900` px/sec (override with `speed` attribute on `<collapsible-content>`)
-- Duration clamped between 250ms and 1s
+- Duration clamped between `min-duration` (default 0.25s) and `max-duration` (default 1s)
+- Both clamps are overridable via attributes on `<collapsible-content>`
 - `#setDynamicDuration` sets `--collapsible-duration` inline; cleaned up in `transitionend`
+
+## Accordion Groups
+
+- `group` attribute on `<collapsible-component>` links items together
+- Opening one item closes others in the same group
+- Static registry (`Map<string, Set>`) on `CollapsibleComponent` for O(1) lookup
+- `observedAttributes` + `attributeChangedCallback` handle dynamic group changes
+- Group logic lives in `#closeSiblings()`, called from `#handleClick`
 
 ## CSS Custom Properties
 

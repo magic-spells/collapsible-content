@@ -10,7 +10,7 @@ A lightweight, accessible Web Component for creating collapsible content section
 - Lightweight
 - Accessible (ARIA attributes, keyboard support, focus management)
 - Smooth animations with `prefers-reduced-motion` support
-- Prevents rapid click issues during animation
+- Smooth mid-animation reversal on rapid clicks
 - Safe to import multiple times (no double-registration errors)
 
 ## Installation
@@ -60,7 +60,7 @@ Add the `open` attribute to start with content visible:
 
 Animation duration scales dynamically with content height using a px/sec speed model. Short panels animate quickly, tall panels take proportionally longer — no fixed duration that feels too slow or too fast.
 
-The default speed is `900` px/sec. Duration is clamped between 250ms and 1s so animations always feel responsive. Tune it with the `speed` attribute:
+The default speed is `900` px/sec. Duration is clamped between 250ms and 1s so animations always feel responsive. Tune it with the `speed`, `min-duration`, and `max-duration` attributes:
 
 ```html
 <!-- Default: 900px/sec -->
@@ -71,11 +71,42 @@ The default speed is `900` px/sec. Duration is clamped between 250ms and 1s so a
 
 <!-- Slower -->
 <collapsible-content speed="80">...</collapsible-content>
+
+<!-- Snappier minimum (150ms instead of 250ms) -->
+<collapsible-content min-duration="0.15">...</collapsible-content>
 ```
 
-| Attribute | Default | Description                          |
-| --------- | ------- | ------------------------------------ |
-| `speed`   | `900`   | Animation speed in pixels per second |
+| Attribute      | Default | Description                                |
+| -------------- | ------- | ------------------------------------------ |
+| `speed`        | `900`   | Animation speed in pixels per second       |
+| `min-duration` | `0.25`  | Minimum animation duration in seconds      |
+| `max-duration` | `1`     | Maximum animation duration in seconds      |
+
+## Accordion Groups
+
+Link collapsible components together with the `group` attribute so that opening one closes the others:
+
+```html
+<collapsible-component group="faq">
+	<button type="button">Question One</button>
+	<collapsible-content>
+		<p>Answer one.</p>
+	</collapsible-content>
+</collapsible-component>
+
+<collapsible-component group="faq">
+	<button type="button">Question Two</button>
+	<collapsible-content>
+		<p>Answer two.</p>
+	</collapsible-content>
+</collapsible-component>
+```
+
+Items without a `group` attribute continue to work independently. All items in a group can be closed simultaneously — clicking the open item simply closes it.
+
+| Attribute | Element                    | Default | Description                                        |
+| --------- | -------------------------- | ------- | -------------------------------------------------- |
+| `group`   | `<collapsible-component>`  | —       | Group name; items with the same name form an accordion |
 
 ## Customization
 
