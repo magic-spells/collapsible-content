@@ -4,6 +4,10 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.CollapsibleContent = {}));
 })(this, (function (exports) { 'use strict';
 
+	const DEFAULT_SPEED = 900; // px per second
+	const MIN_DURATION = 0.25; // seconds
+	const MAX_DURATION = 1.0; // seconds
+
 	/**
 	 * Custom element that creates a collapsible/expandable component with proper accessibility
 	 */
@@ -22,13 +26,10 @@
 			_.button = null;
 			_.content = null;
 
-			// define click handler with proper this binding
-			_.#handleClick = (e) => {
-				e.preventDefault();
-				// toggle expanded value
-				const expanded = _.button.getAttribute('aria-expanded') !== 'true';
-				_.button.setAttribute('aria-expanded', expanded);
-				_.content.collapsed = !expanded;
+			// define click handler — content is source of truth
+			_.#handleClick = () => {
+				_.content.collapsed = !_.content.collapsed;
+				_.button.setAttribute('aria-expanded', !_.content.collapsed);
 			};
 		}
 
@@ -62,14 +63,26 @@
 			_.content.id ||= `collapsible-content-${crypto.randomUUID().slice(0, 8)}`;
 
 			// set accessibility attributes
-			_.button.type ||= 'button';
+			if (!_.button.hasAttribute('type')) {
+				_.button.type = 'button';
+			}
 			_.button.setAttribute('aria-controls', _.content.id);
 			_.content.setAttribute('aria-labelledby', _.button.id);
+			if (!_.content.hasAttribute('role')) {
+				_.content.setAttribute('role', 'region');
+			}
 
-			// set initial state based on open attribute
+			// set initial state without triggering an opening/closing animation
 			const open = _.content.hasAttribute('open');
 			_.button.setAttribute('aria-expanded', open);
-			_.content.collapsed = !open;
+			_.content.style.height = open ? 'auto' : '0px';
+			if (open) {
+				_.content.removeAttribute('aria-hidden');
+				_.content.removeAttribute('inert');
+			} else {
+				_.content.setAttribute('aria-hidden', 'true');
+				_.content.setAttribute('inert', '');
+			}
 
 			// use AbortController to prevent duplicate listeners on reconnection
 			_.#abortController = new AbortController();
@@ -108,10 +121,11 @@
 
 			// define event handler using arrow function for proper binding
 			_.#handleTransitionEnd = (event) => {
-				// exit if isn't height property
+				if (event.target !== _) return;
 				if (event.propertyName !== 'height') return;
 
 				_.#animating = false;
+				_.style.removeProperty('--collapsible-duration');
 
 				// remove the inline height to allow dynamic content changes
 				if (!_.collapsed) {
@@ -141,10 +155,39 @@
 		 */
 		disconnectedCallback() {
 			const _ = this;
+			_.#animating = false;
 			if (_.#abortController) {
 				_.#abortController.abort();
 				_.#abortController = null;
 			}
+		}
+
+		get #speed() {
+			const attr = this.getAttribute('speed');
+			if (attr === null) return DEFAULT_SPEED;
+			const value = Number(attr);
+			return value > 0 ? value : DEFAULT_SPEED;
+		}
+
+		get #minDuration() {
+			const attr = this.getAttribute('min-duration');
+			if (attr === null) return MIN_DURATION;
+			const value = Number(attr);
+			return value > 0 ? value : MIN_DURATION;
+		}
+
+		get #maxDuration() {
+			const attr = this.getAttribute('max-duration');
+			if (attr === null) return MAX_DURATION;
+			const value = Number(attr);
+			return value > 0 ? value : MAX_DURATION;
+		}
+
+		#setDynamicDuration(currentHeight, targetHeight) {
+			const _ = this;
+			const delta = Math.abs(targetHeight - currentHeight);
+			const duration = Math.min(_.#maxDuration, Math.max(_.#minDuration, delta / _.#speed));
+			_.style.setProperty('--collapsible-duration', `${duration.toFixed(3)}s`);
 		}
 
 		/**
@@ -153,43 +196,46 @@
 		 */
 		set collapsed(value) {
 			const _ = this;
-
-			// prevent rapid clicking during animation
-			if (_.#animating) return;
+			const collapsed = Boolean(value);
+			if (_.collapsed === collapsed) return;
 
 			// check if transitions are enabled (respects prefers-reduced-motion)
 			const hasTransition = getComputedStyle(_).transitionDuration !== '0s';
 
-			if (value) {
-				if (hasTransition) {
-					_.#animating = true;
-				}
-
-				// animate to closed
-				_.style.height = `${_.scrollHeight}px`;
-
-				// use requestAnimationFrame for reliable frame timing
-				requestAnimationFrame(() => {
-					requestAnimationFrame(() => {
-						_.style.height = '0px';
-					});
-				});
-
+			if (collapsed) {
 				_.removeAttribute('open');
 				_.setAttribute('aria-hidden', 'true');
 				_.setAttribute('inert', '');
-			} else {
-				// only animate if not already auto
-				if (_.style.height !== 'auto') {
-					if (hasTransition) {
-						_.#animating = true;
-					}
-					_.style.height = `${_.scrollHeight}px`;
+
+				if (!hasTransition) {
+					_.style.height = '0px';
+					return;
 				}
 
+				// capture current height in px (converts auto or mid-animation value)
+				const currentHeight = _.getBoundingClientRect().height;
+				_.style.height = `${currentHeight}px`;
+				_.#setDynamicDuration(currentHeight, 0);
+				_.#animating = true;
+				_.offsetHeight; // force reflow — browser commits the px start value
+				_.style.height = '0px';
+			} else {
 				_.setAttribute('open', '');
 				_.removeAttribute('aria-hidden');
 				_.removeAttribute('inert');
+
+				if (!hasTransition) {
+					_.style.height = 'auto';
+					return;
+				}
+
+				// capture current height in px (0px or mid-animation value)
+				const currentHeight = _.getBoundingClientRect().height;
+				_.style.height = `${currentHeight}px`;
+				_.#setDynamicDuration(currentHeight, _.scrollHeight);
+				_.#animating = true;
+				_.offsetHeight; // force reflow — browser commits the px start value
+				_.style.height = `${_.scrollHeight}px`;
 			}
 		}
 

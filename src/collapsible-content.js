@@ -1,5 +1,9 @@
 import './collapsible-content.css';
 
+const DEFAULT_SPEED = 900; // px per second
+const MIN_DURATION = 0.25; // seconds
+const MAX_DURATION = 1.0; // seconds
+
 /**
  * Custom element that creates a collapsible/expandable component with proper accessibility
  */
@@ -117,6 +121,7 @@ class CollapsibleContent extends HTMLElement {
 			if (event.propertyName !== 'height') return;
 
 			_.#animating = false;
+			_.style.removeProperty('--collapsible-duration');
 
 			// remove the inline height to allow dynamic content changes
 			if (!_.collapsed) {
@@ -153,6 +158,34 @@ class CollapsibleContent extends HTMLElement {
 		}
 	}
 
+	get #speed() {
+		const attr = this.getAttribute('speed');
+		if (attr === null) return DEFAULT_SPEED;
+		const value = Number(attr);
+		return value > 0 ? value : DEFAULT_SPEED;
+	}
+
+	get #minDuration() {
+		const attr = this.getAttribute('min-duration');
+		if (attr === null) return MIN_DURATION;
+		const value = Number(attr);
+		return value > 0 ? value : MIN_DURATION;
+	}
+
+	get #maxDuration() {
+		const attr = this.getAttribute('max-duration');
+		if (attr === null) return MAX_DURATION;
+		const value = Number(attr);
+		return value > 0 ? value : MAX_DURATION;
+	}
+
+	#setDynamicDuration(currentHeight, targetHeight) {
+		const _ = this;
+		const delta = Math.abs(targetHeight - currentHeight);
+		const duration = Math.min(_.#maxDuration, Math.max(_.#minDuration, delta / _.#speed));
+		_.style.setProperty('--collapsible-duration', `${duration.toFixed(3)}s`);
+	}
+
 	/**
 	 * Handles setting the collapsed state with animation
 	 * @param {boolean} value - Whether element should be collapsed
@@ -176,7 +209,9 @@ class CollapsibleContent extends HTMLElement {
 			}
 
 			// capture current height in px (converts auto or mid-animation value)
-			_.style.height = `${_.getBoundingClientRect().height}px`;
+			const currentHeight = _.getBoundingClientRect().height;
+			_.style.height = `${currentHeight}px`;
+			_.#setDynamicDuration(currentHeight, 0);
 			_.#animating = true;
 			_.offsetHeight; // force reflow — browser commits the px start value
 			_.style.height = '0px';
@@ -191,7 +226,9 @@ class CollapsibleContent extends HTMLElement {
 			}
 
 			// capture current height in px (0px or mid-animation value)
-			_.style.height = `${_.getBoundingClientRect().height}px`;
+			const currentHeight = _.getBoundingClientRect().height;
+			_.style.height = `${currentHeight}px`;
+			_.#setDynamicDuration(currentHeight, _.scrollHeight);
 			_.#animating = true;
 			_.offsetHeight; // force reflow — browser commits the px start value
 			_.style.height = `${_.scrollHeight}px`;

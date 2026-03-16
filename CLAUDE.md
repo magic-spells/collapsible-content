@@ -30,7 +30,14 @@ npm run lint     # ESLint
 npm run format   # Prettier
 ```
 
+## Animation
+
+- Duration is dynamic: calculated from content height and `speed` attribute (px/sec)
+- Default speed: `900` px/sec (override with `speed` attribute on `<collapsible-content>`)
+- Duration clamped between 250ms and 1s
+- `#setDynamicDuration` sets `--collapsible-duration` inline; cleaned up in `transitionend`
+
 ## CSS Custom Properties
 
-- `--collapsible-duration` (default: 0.35s)
-- `--collapsible-easing` (default: ease-out)
+- `--collapsible-duration` (dynamically set by JS based on content height)
+- `--collapsible-easing` (default: ease)

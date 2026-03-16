@@ -1,3 +1,6 @@
 **/*.min.js
+**/*.md
 assets/
+dist/
+demo/
 node_modules/

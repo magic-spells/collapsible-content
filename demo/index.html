@@ -3,83 +3,1038 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Collapsible Component Demo</title>
+		<title>Collapsible Content -- @magic-spells</title>
 		<link rel="stylesheet" href="./collapsible-content.min.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=DM+Mono:wght@300;400&display=swap"
+			rel="stylesheet" />
 		<style>
-			/* Basic styles for the demo */
-			body {
-				font-family: Helvetica, sans-serif;
-				line-height: 1.6;
-				margin: 20px;
-			}
-			h1 {
-				color: #333;
-			}
-			collapsible-component button {
-				cursor: pointer;
-				padding: 10px 15px;
-				background-color: #c3c3c3;
-				color: #fff;
-				border: none;
-				font-size: 16px;
-				color: black;
-			}
-			collapsible-component button:hover {
-				background-color: #0056b3;
-				color: white;
-			}
-
-			collapsible-component {
-				background-color: #f8f9fa;
-				border: 1px solid gray;
-				margin: 10px 0;
-			}
-
-			collapsible-content {
-				padding: 0px;
-				border: none;
-				border-radius: 4px;
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
 				margin: 0;
-				overflow: hidden;
+				padding: 0;
+			}
+
+			:root {
+				--bg: #0c0c0d;
+				--surface: #161618;
+				--surface-raised: #1e1e21;
+				--border: #2a2a2e;
+				--text: #e8e4de;
+				--text-dim: #8a8680;
+				--accent: #d4a24e;
+				--accent-glow: rgba(212, 162, 78, 0.15);
+				--coral: #c75d4a;
+				--lavender: #8b7ec8;
+				--font-display: 'Instrument Serif', Georgia, serif;
+				--font-body: 'DM Sans', system-ui, sans-serif;
+				--font-mono: 'DM Mono', 'SF Mono', monospace;
+				--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+			}
+
+			html {
+				font-size: 16px;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			body {
+				font-family: var(--font-body);
+				font-weight: 300;
+				color: var(--text);
+				background: var(--bg);
+				line-height: 1.6;
+				min-height: 100vh;
+			}
+
+			body::before {
+				content: '';
+				position: fixed;
+				inset: 0;
+				z-index: 1;
+				pointer-events: none;
+				opacity: 0.03;
+				background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+				background-size: 200px;
+			}
+
+			.page {
+				max-width: 840px;
+				margin: 0 auto;
+				padding: 4rem 2rem 6rem;
+			}
+
+			/* ---- Hero ---- */
+
+			.hero {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+				padding-bottom: 4rem;
+				position: relative;
+				animation: fadeUp 0.8s var(--ease-out) backwards;
+			}
+
+			.hero::before {
+				content: '';
+				position: absolute;
+				top: -120px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 600px;
+				height: 600px;
+				border-radius: 50%;
+				background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+				z-index: -1;
+				pointer-events: none;
+			}
+
+			.hero-badge {
+				display: inline-block;
+				font-family: var(--font-mono);
+				font-size: 0.75rem;
+				font-weight: 400;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--accent);
+				text-decoration: none;
+				border: 1px solid var(--accent);
+				border-radius: 100px;
+				padding: 0.3rem 1rem;
+				margin-bottom: 1.5rem;
+				background: var(--accent-glow);
+				transition:
+					border-color 0.3s,
+					color 0.3s;
+			}
+
+			.hero-badge:hover {
+				border-color: #e0b05e;
+				color: var(--text);
+			}
+
+			.hero h1 {
+				font-family: var(--font-display);
+				font-size: clamp(2.8rem, 6vw, 4.2rem);
+				font-weight: 400;
+				line-height: 1.1;
+				letter-spacing: -0.02em;
+				color: var(--text);
+				margin-bottom: 1.25rem;
+			}
+
+			.hero h1 em {
+				font-style: italic;
+				color: var(--accent);
+			}
+
+			.hero p {
+				font-size: 1.1rem;
+				color: var(--text-dim);
+				max-width: 540px;
+				line-height: 1.7;
+			}
+
+			.hero-line {
+				width: 1px;
+				height: 64px;
+				margin-top: 2.5rem;
+				background: linear-gradient(to bottom, var(--accent), transparent);
+			}
+
+			/* ---- Install Banner ---- */
+
+			.install-banner {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 2.5rem;
+				padding: 1.25rem 2rem;
+				margin-bottom: 4rem;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				animation: fadeUp 0.8s var(--ease-out) 0.2s backwards;
+			}
+
+			.install-item {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+			}
+
+			.install-label {
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--text-dim);
+			}
+
+			.install-value {
+				font-family: var(--font-mono);
+				font-size: 0.85rem;
+				color: var(--text);
+				cursor: copy;
+				padding: 0.3rem 0.75rem;
+				background: var(--surface-raised);
+				border: 1px solid var(--border);
+				border-radius: 6px;
+				transition: border-color 0.3s;
+				user-select: all;
+			}
+
+			.install-value:hover {
+				border-color: var(--accent);
+			}
+
+			.install-size {
+				font-family: var(--font-mono);
+				font-size: 0.85rem;
+				color: var(--accent);
+			}
+
+			/* ---- Sections ---- */
+
+			.example {
+				margin-bottom: 5rem;
+				animation: fadeUp 0.8s var(--ease-out) backwards;
+			}
+
+			.example h2 {
+				font-family: var(--font-display);
+				font-size: 1.8rem;
+				font-weight: 400;
+				color: var(--text);
+				margin-bottom: 0.5rem;
+			}
+
+			.example > p {
+				color: var(--text-dim);
+				font-size: 0.95rem;
+				margin-bottom: 2rem;
+				max-width: 520px;
+			}
+
+			.example > p code {
+				font-family: var(--font-mono);
+				font-size: 0.82em;
+				color: var(--accent);
+			}
+
+			/* ---- Code Block ---- */
+
+			.code-block {
+				background: var(--surface-raised);
+				border: 1px solid var(--border);
+				border-radius: 10px;
+				padding: 1.25rem 1.5rem;
+				overflow-x: auto;
+				margin-top: 1.5rem;
+			}
+
+			.code-block code {
+				font-family: var(--font-mono);
+				font-size: 0.78rem;
+				font-weight: 300;
+				line-height: 1.8;
+				color: var(--text-dim);
+				white-space: pre;
+			}
+
+			.code-block .hl-tag {
+				color: var(--accent);
+			}
+
+			.code-block .hl-attr {
+				color: var(--lavender);
+			}
+
+			.code-block .hl-value {
+				color: var(--coral);
+			}
+
+			.code-block .hl-comment {
+				color: #555;
+				font-style: italic;
+			}
+
+			/* ---- Demo Surface ---- */
+
+			.demo-surface {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 2rem;
+				position: relative;
+			}
+
+			/* ---- Accordion Styling ---- */
+
+			.demo-surface collapsible-component {
+				border-bottom: 1px solid var(--border);
+			}
+
+			.demo-surface collapsible-component:last-child {
+				border-bottom: none;
+			}
+
+			.demo-surface collapsible-component button {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 1rem 0.25rem;
+				font-family: var(--font-body);
+				font-size: 0.95rem;
+				font-weight: 400;
+				color: var(--text);
+				transition: color 0.25s var(--ease-out);
+			}
+
+			.demo-surface collapsible-component button:hover {
+				color: var(--accent);
+			}
+
+			.demo-surface collapsible-component button[aria-expanded='true'] {
+				color: var(--accent);
+			}
+
+			.demo-surface collapsible-component button::after {
+				content: '';
+				width: 8px;
+				height: 8px;
+				border-right: 1.5px solid var(--text-dim);
+				border-bottom: 1.5px solid var(--text-dim);
+				transform: rotate(45deg);
+				transition:
+					transform 0.3s var(--ease-out),
+					border-color 0.3s;
+				flex-shrink: 0;
+				margin-left: 1rem;
+			}
+
+			.demo-surface collapsible-component button[aria-expanded='true']::after {
+				transform: rotate(-135deg);
+				border-color: var(--accent);
+			}
+
+			.demo-surface collapsible-component button:focus-visible {
+				outline-color: var(--accent);
 			}
 
 			.content-wrapper {
-				padding: 10px 15px;
+				padding: 0.25rem 0.25rem 1rem;
+			}
+
+			.content-wrapper p {
+				color: var(--text-dim);
+				font-size: 0.9rem;
+				line-height: 1.7;
+			}
+
+			.content-wrapper ul {
+				color: var(--text-dim);
+				font-size: 0.9rem;
+				line-height: 1.8;
+				padding-left: 1.25rem;
+				margin-top: 0.5rem;
+			}
+
+			.content-wrapper code {
+				font-family: var(--font-mono);
+				font-size: 0.82em;
+				color: var(--accent);
+				background: var(--surface-raised);
+				padding: 0.15em 0.4em;
+				border-radius: 4px;
+			}
+
+			.content-wrapper h4 {
+				font-family: var(--font-body);
+				font-size: 0.85rem;
+				font-weight: 500;
+				color: var(--text);
+				margin-bottom: 0.5rem;
+				letter-spacing: 0.01em;
+			}
+
+			/* ---- Timing Label ---- */
+
+			.timing-label {
+				display: inline-block;
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				letter-spacing: 0.05em;
+				color: var(--text-dim);
+				background: var(--surface-raised);
+				padding: 0.2rem 0.6rem;
+				border-radius: 4px;
+				border: 1px solid var(--border);
+				margin-left: 0.75rem;
+				vertical-align: middle;
+			}
+
+			/* ---- Keyboard Grid ---- */
+
+			.keyboard-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: 1rem;
+				margin-bottom: 2rem;
+			}
+
+			.key-item {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+			}
+
+			kbd {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 2rem;
+				height: 1.75rem;
+				padding: 0 0.5rem;
+				font-family: var(--font-mono);
+				font-size: 0.7rem;
+				font-weight: 400;
+				color: var(--text);
+				background: var(--surface-raised);
+				border: 1px solid var(--border);
+				border-bottom-width: 2px;
+				border-radius: 5px;
+				white-space: nowrap;
+			}
+
+			.key-desc {
+				font-size: 0.82rem;
+				color: var(--text-dim);
+			}
+
+			/* ---- ARIA Features ---- */
+
+			.aria-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+				gap: 0.75rem;
+				margin-top: 1.5rem;
+			}
+
+			.aria-item {
+				display: flex;
+				align-items: baseline;
+				gap: 0.6rem;
+				font-size: 0.85rem;
+				color: var(--text-dim);
+				line-height: 1.5;
+			}
+
+			.aria-item code {
+				font-family: var(--font-mono);
+				font-size: 0.75rem;
+				color: var(--accent);
+				background: var(--surface-raised);
+				padding: 0.15em 0.4em;
+				border-radius: 4px;
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+
+			/* ---- Footer ---- */
+
+			footer {
+				margin-top: 2rem;
+				padding-top: 2rem;
+				border-top: 1px solid var(--border);
+				animation: fadeUp 0.8s var(--ease-out) 0.5s backwards;
+			}
+
+			footer p {
+				font-family: var(--font-mono);
+				font-size: 0.72rem;
+				color: var(--text-dim);
+				letter-spacing: 0.04em;
+			}
+
+			/* ---- Animation ---- */
+
+			@keyframes fadeUp {
+				from {
+					opacity: 0;
+					transform: translateY(16px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			/* ---- Responsive ---- */
+
+			@media (max-width: 600px) {
+				.page {
+					padding: 2.5rem 1.25rem 4rem;
+				}
+
+				.hero {
+					padding-bottom: 2.5rem;
+				}
+
+				.example {
+					margin-bottom: 3.5rem;
+				}
+
+				.demo-surface {
+					padding: 1.25rem;
+				}
+
+				.keyboard-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.aria-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.install-banner {
+					flex-direction: column;
+					gap: 1rem;
+					text-align: center;
+				}
 			}
 		</style>
 	</head>
 	<body>
-		<h1>Collapsible Component Demo</h1>
+		<div class="page">
+			<header class="hero">
+				<a
+					class="hero-badge"
+					href="https://github.com/magic-spells/collapsible-content"
+					target="_blank"
+					rel="noopener"
+					>@magic-spells/collapsible-content</a
+				>
+				<h1>Collapse with<br /><em>elegance</em></h1>
+				<p>
+					An accessible collapsible &amp; accordion web component with smooth height animation, ARIA
+					support, and CSS-variable theming. No Shadow DOM &mdash; style it directly.
+				</p>
+				<div class="hero-line"></div>
+			</header>
 
-		<!-- Example Collapsible Component -->
-		<collapsible-component>
-			<button type="button">Product Information</button>
-			<collapsible-content open>
-				<div class="content-wrapper">
-					<h3>Details</h3>
-					<p>
-						This product is made with 100% organic materials. It's durable, eco-friendly, and
-						stylish.
-					</p>
-					<input type="text" />
+			<div class="install-banner">
+				<div class="install-item">
+					<span class="install-label">Install</span>
+					<code class="install-value">npm i @magic-spells/collapsible-content</code>
 				</div>
-			</collapsible-content>
-		</collapsible-component>
-
-		<collapsible-component>
-			<button type="button">Shipping Information</button>
-			<collapsible-content>
-				<div class="content-wrapper">
-					<h3>Shipping</h3>
-					<p>
-						Free shipping on orders over $50. Orders are typically processed within 1-2 business
-						days.
-					</p>
+				<div class="install-item">
+					<span class="install-label">Size (gzip)</span>
+					<span class="install-size">~2 KB</span>
 				</div>
-			</collapsible-content>
-		</collapsible-component>
+			</div>
 
-		<!-- Load the bundled script -->
+			<main>
+				<!-- Markup -->
+				<section class="example">
+					<h2>Markup</h2>
+					<p>
+						Drop-in HTML structure. A button triggers the collapsible panel &mdash; all ARIA wiring
+						is automatic.
+					</p>
+					<div class="code-block">
+						<code>&lt;<span class="hl-tag">collapsible-component</span>&gt;
+  &lt;<span class="hl-tag">button</span> <span class="hl-attr">type</span>=<span class="hl-value">"button"</span>&gt;Section Title&lt;/<span class="hl-tag">button</span>&gt;
+  &lt;<span class="hl-tag">collapsible-content</span>&gt;
+    &lt;<span class="hl-tag">div</span> <span class="hl-attr">class</span>=<span class="hl-value">"content-wrapper"</span>&gt;
+      &lt;<span class="hl-tag">p</span>&gt;Your content here...&lt;/<span class="hl-tag">p</span>&gt;
+    &lt;/<span class="hl-tag">div</span>&gt;
+  &lt;/<span class="hl-tag">collapsible-content</span>&gt;
+&lt;/<span class="hl-tag">collapsible-component</span>&gt;
+
+<span class="hl-comment">&lt;!-- Start open with the open attribute --&gt;</span>
+&lt;<span class="hl-tag">collapsible-content</span> <span class="hl-attr">open</span>&gt;...&lt;/<span class="hl-tag">collapsible-content</span>&gt;
+
+<span class="hl-comment">&lt;!-- Custom animation speed (px/sec) --&gt;</span>
+&lt;<span class="hl-tag">collapsible-content</span> <span class="hl-attr">speed</span>=<span class="hl-value">"800"</span>&gt;...&lt;/<span class="hl-tag">collapsible-content</span>&gt;</code>
+					</div>
+				</section>
+
+				<!-- Basic Accordion -->
+				<section class="example">
+					<h2>Accordion</h2>
+					<p>
+						Animation duration is calculated dynamically from content height using a
+						<code>speed</code> attribute (default: <code>900</code> px/sec). Short panels
+						animate quickly, tall panels take proportionally longer &mdash; no fixed duration
+						that feels too slow or too fast.
+					</p>
+					<div class="demo-surface">
+						<collapsible-component>
+							<button type="button">What makes this different from &lt;details&gt;?</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										The native <code>&lt;details&gt;</code> element snaps open instantly with no
+										animation. This component provides smooth height transitions, proper ARIA
+										attributes, inert management for hidden content, and programmatic control via
+										the <code>.collapsed</code> property.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">Is it accessible?</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										Yes. The component automatically manages
+										<code>aria-expanded</code> on the button, <code>aria-hidden</code> and
+										<code>inert</code> on the content panel, and links the two with
+										<code>aria-controls</code> and <code>aria-labelledby</code>. Focus is trapped
+										out of collapsed content.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">Can I nest collapsible components?</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										Absolutely. Each
+										<code>&lt;collapsible-component&gt;</code> operates independently. Nest them as
+										deeply as you need &mdash; the height animation recalculates correctly for all
+										levels.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">How do I style it?</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										There's no Shadow DOM, so you style everything with plain CSS. Customize
+										animation timing with
+										<code>--collapsible-duration</code> and <code>--collapsible-easing</code>. Style
+										buttons, content, and layout with any selectors you like.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+					</div>
+				</section>
+
+				<!-- Initially Open -->
+				<section class="example">
+					<h2>Initially Open</h2>
+					<p>
+						Add the <code>open</code> attribute to <code>&lt;collapsible-content&gt;</code> to start
+						expanded.
+					</p>
+					<div class="demo-surface">
+						<collapsible-component>
+							<button type="button">Getting Started</button>
+							<collapsible-content open>
+								<div class="content-wrapper">
+									<p>
+										Include the CSS and JS, then drop the markup into your page. The component
+										registers itself automatically &mdash; no initialization code required. This
+										section starts open by default.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">Advanced Usage</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										Control state programmatically with the
+										<code>.collapsed</code> setter. Read the current state with the
+										<code>.collapsed</code> getter. Listen for the
+										<code>collapsible-error</code> event if child elements are missing.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+					</div>
+				</section>
+
+				<!-- Custom Easing -->
+				<section class="example">
+					<h2>Custom Easing</h2>
+					<p>
+						Override <code>--collapsible-easing</code> for different animation feels.
+					</p>
+					<div class="demo-surface">
+						<collapsible-component>
+							<button type="button">
+								Slow &amp; Springy
+								<span class="timing-label">spring</span>
+							</button>
+							<collapsible-content
+								speed="150"
+								style="--collapsible-easing: cubic-bezier(0.34, 1.56, 0.64, 1)">
+								<div class="content-wrapper">
+									<p>
+										A longer duration with a spring overshoot curve. Great for playful interfaces
+										where motion adds personality.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">
+								Fast &amp; Snappy
+								<span class="timing-label">ease-out · 150ms min</span>
+							</button>
+							<collapsible-content
+								min-duration="0.15"
+								style="--collapsible-easing: ease-out">
+								<div class="content-wrapper">
+									<p>
+										A lower <code>min-duration</code> of 150ms lets short panels snap open
+										faster than the default 250ms clamp. Paired with ease-out for a crisp feel.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">
+								Default
+								<span class="timing-label">ease</span>
+							</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										The built-in default. A balanced ease curve that works well for most use cases.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">
+								Tall &amp; Dramatic
+								<span class="timing-label">spring</span>
+							</button>
+							<collapsible-content
+								speed="150"
+								style="--collapsible-easing: cubic-bezier(0.34, 1.56, 0.64, 1)">
+								<div class="content-wrapper">
+									<p>
+										A slow spring on a tall panel really shows off the animation curve. Watch the
+										overshoot as it settles into place.
+									</p>
+									<p style="margin-top: 0.75rem">
+										The spring easing overshoots its target height briefly before easing back
+										&mdash; the taller the content, the more dramatic the effect. This is useful for
+										reveal moments where you want the user to notice the motion.
+									</p>
+									<ul style="margin-top: 0.75rem">
+										<li>
+											Easing:
+											<code>cubic-bezier(0.34, 1.56, 0.64, 1)</code>
+										</li>
+										<li>Content height drives the visual impact</li>
+										<li>Works well for onboarding flows, feature tours, and settings panels</li>
+									</ul>
+									<p style="margin-top: 0.75rem">
+										Pair a longer duration with generous content to create an intentional, cinematic
+										feel. For shorter content, consider dialing the duration back to avoid the
+										animation feeling sluggish.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+					</div>
+				</section>
+
+				<!-- Dynamic Speed -->
+				<section class="example">
+					<h2>Dynamic Speed</h2>
+					<p>
+						The <code>speed</code> attribute sets animation speed in px/sec. Duration scales with
+						content height so short and tall panels feel proportional. Default is <code>900</code>.
+					</p>
+					<div class="demo-surface">
+						<collapsible-component>
+							<button type="button">
+								Short Content
+								<span class="timing-label">default speed</span>
+							</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										A short paragraph. The animation is quick because there's less distance to
+										cover.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">
+								Tall Content
+								<span class="timing-label">default speed</span>
+							</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>
+										This panel has a lot more content, so the animation takes proportionally longer.
+										The speed stays consistent &mdash; only the duration changes.
+									</p>
+									<ul style="margin-top: 0.75rem">
+										<li>Duration scales linearly with content height</li>
+										<li>Short panels feel snappy</li>
+										<li>Tall panels feel smooth, not sluggish</li>
+										<li>Mid-animation reversals stay proportional</li>
+										<li>Duration is clamped between 250ms and 1s</li>
+									</ul>
+									<p style="margin-top: 0.75rem">
+										Try clicking the button rapidly to see mid-animation reversal. The component
+										captures the current in-progress height and calculates a new duration for the
+										remaining distance.
+									</p>
+									<p style="margin-top: 0.75rem">
+										The clamping ensures that very short panels don't animate so fast they feel
+										instant, and very tall panels don't drag on forever. This creates a consistent
+										feel regardless of content size.
+									</p>
+									<ul style="margin-top: 0.75rem">
+										<li>Minimum duration: 250ms &mdash; keeps short panels visible during transition</li>
+										<li>Maximum duration: 1s &mdash; prevents tall panels from feeling sluggish</li>
+										<li>Everything in between scales linearly with height</li>
+									</ul>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">
+								Fast
+								<span class="timing-label">min-duration="0.15"</span>
+							</button>
+							<collapsible-content min-duration="0.15" style="--collapsible-easing: ease-out">
+								<div class="content-wrapper">
+									<p>
+										With <code>min-duration="0.15"</code>, the minimum clamp drops to 150ms
+										so short panels animate faster. The ease-out curve gives a crisp, snappy
+										feel.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">
+								Slow
+								<span class="timing-label">speed="80"</span>
+							</button>
+							<collapsible-content speed="80">
+								<div class="content-wrapper">
+									<p>
+										With <code>speed="80"</code>, the animation moves at 80px/sec. Useful for
+										dramatic reveals or onboarding flows.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+					</div>
+
+					<div class="code-block">
+						<code
+							>&lt;<span class="hl-tag">collapsible-content</span>&gt;
+							<span class="hl-comment">&lt;!-- default: 900px/sec --&gt;</span>
+							&lt;/<span class="hl-tag">collapsible-content</span>&gt; &lt;<span class="hl-tag"
+								>collapsible-content</span
+							>
+							<span class="hl-attr">speed</span>=<span class="hl-value">"1200"</span>&gt;
+							<span class="hl-comment">&lt;!-- faster: 1200px/sec --&gt;</span>
+							&lt;/<span class="hl-tag">collapsible-content</span>&gt; &lt;<span class="hl-tag"
+								>collapsible-content</span
+							>
+							<span class="hl-attr">speed</span>=<span class="hl-value">"80"</span>&gt;
+							<span class="hl-comment">&lt;!-- slower: 80px/sec --&gt;</span>
+							&lt;/<span class="hl-tag">collapsible-content</span>&gt;</code
+						>
+					</div>
+				</section>
+
+				<!-- Rich Content -->
+				<section class="example">
+					<h2>Rich Content</h2>
+					<p>
+						Collapsible panels handle any content &mdash; lists, code, nested elements. Height
+						recalculates automatically.
+					</p>
+					<div class="demo-surface">
+						<collapsible-component>
+							<button type="button">Installation Methods</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<h4>Package Manager</h4>
+									<p>Install via npm and import into your build:</p>
+									<ul>
+										<li>
+											<code>npm i @magic-spells/collapsible-content</code>
+										</li>
+										<li>Import the module and CSS in your entry file</li>
+										<li>The component self-registers on import</li>
+									</ul>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">CSS Custom Properties</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<h4>Available Properties</h4>
+									<ul>
+										<li>
+											<code>--collapsible-duration</code> &mdash; animation length (dynamic,
+											based on content height)
+										</li>
+										<li>
+											<code>--collapsible-easing</code> &mdash; timing function (default:
+											<code>ease-out</code>)
+										</li>
+									</ul>
+									<p style="margin-top: 0.75rem">
+										Set these on the
+										<code>&lt;collapsible-content&gt;</code> element or any ancestor. The component
+										also respects <code>prefers-reduced-motion</code> &mdash; transitions are
+										disabled automatically when the user prefers reduced motion.
+									</p>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+
+						<collapsible-component>
+							<button type="button">Nested Collapsibles</button>
+							<collapsible-content>
+								<div class="content-wrapper">
+									<p>Components can be nested. Each instance operates independently:</p>
+									<div
+										style="
+											margin-top: 0.75rem;
+											padding-left: 0.75rem;
+											border-left: 1px solid var(--border);
+										">
+										<collapsible-component>
+											<button type="button">Inner Section A</button>
+											<collapsible-content>
+												<div class="content-wrapper">
+													<p>
+														This is a nested collapsible. The parent panel's height adjusts
+														automatically when inner panels open or close.
+													</p>
+												</div>
+											</collapsible-content>
+										</collapsible-component>
+										<collapsible-component>
+											<button type="button">Inner Section B</button>
+											<collapsible-content>
+												<div class="content-wrapper">
+													<p>
+														Try opening both inner sections while the parent is open. The animation
+														stays smooth at every level.
+													</p>
+												</div>
+											</collapsible-content>
+										</collapsible-component>
+									</div>
+								</div>
+							</collapsible-content>
+						</collapsible-component>
+					</div>
+				</section>
+
+				<!-- Keyboard & Accessibility -->
+				<section class="example">
+					<h2>Keyboard &amp; Accessibility</h2>
+					<p>Full keyboard support and ARIA attributes are managed automatically.</p>
+					<div class="demo-surface">
+						<div class="keyboard-grid">
+							<div class="key-item">
+								<kbd>Tab</kbd>
+								<span class="key-desc">Focus trigger button</span>
+							</div>
+							<div class="key-item">
+								<kbd>Enter</kbd>
+								<span class="key-desc">Toggle panel</span>
+							</div>
+							<div class="key-item">
+								<kbd>Space</kbd>
+								<span class="key-desc">Toggle panel</span>
+							</div>
+						</div>
+
+						<div class="aria-grid">
+							<div class="aria-item">
+								<code>aria-expanded</code>
+								<span>Set on button</span>
+							</div>
+							<div class="aria-item">
+								<code>aria-controls</code>
+								<span>Links button to panel</span>
+							</div>
+							<div class="aria-item">
+								<code>aria-labelledby</code>
+								<span>Labels panel by button</span>
+							</div>
+							<div class="aria-item">
+								<code>aria-hidden</code>
+								<span>Hides collapsed content</span>
+							</div>
+							<div class="aria-item">
+								<code>inert</code>
+								<span>Prevents focus in hidden panels</span>
+							</div>
+							<div class="aria-item">
+								<code>focus-visible</code>
+								<span>Keyboard-only outline</span>
+							</div>
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<footer>
+				<p>&copy; 2026 Magic Spells. Released under the MIT License.</p>
+			</footer>
+		</div>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				const installValue = document.querySelector('.install-value');
+				if (installValue) {
+					installValue.addEventListener('click', () => {
+						const text = installValue.textContent;
+						navigator.clipboard.writeText(text).then(() => {
+							installValue.textContent = 'Copied!';
+							setTimeout(() => {
+								installValue.textContent = text;
+							}, 1500);
+						});
+					});
+				}
+			});
+		</script>
 		<script type="module" src="./collapsible-content.esm.js"></script>
 	</body>
 </html>

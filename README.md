@@ -33,13 +33,13 @@ Or include directly in your HTML:
 
 ```html
 <collapsible-component>
-  <button type="button">Product Information</button>
-  <collapsible-content>
-    <div class="content-wrapper">
-      <h3>Details</h3>
-      <p>This product is made with 100% organic materials.</p>
-    </div>
-  </collapsible-content>
+	<button type="button">Product Information</button>
+	<collapsible-content>
+		<div class="content-wrapper">
+			<h3>Details</h3>
+			<p>This product is made with 100% organic materials.</p>
+		</div>
+	</collapsible-content>
 </collapsible-component>
 ```
 
@@ -49,28 +49,48 @@ Add the `open` attribute to start with content visible:
 
 ```html
 <collapsible-component>
-  <button type="button">Already Open</button>
-  <collapsible-content open>
-    <p>This content is visible by default.</p>
-  </collapsible-content>
+	<button type="button">Already Open</button>
+	<collapsible-content open>
+		<p>This content is visible by default.</p>
+	</collapsible-content>
 </collapsible-component>
 ```
 
+## Animation Speed
+
+Animation duration scales dynamically with content height using a px/sec speed model. Short panels animate quickly, tall panels take proportionally longer — no fixed duration that feels too slow or too fast.
+
+The default speed is `900` px/sec. Duration is clamped between 250ms and 1s so animations always feel responsive. Tune it with the `speed` attribute:
+
+```html
+<!-- Default: 900px/sec -->
+<collapsible-content>...</collapsible-content>
+
+<!-- Faster -->
+<collapsible-content speed="1200">...</collapsible-content>
+
+<!-- Slower -->
+<collapsible-content speed="80">...</collapsible-content>
+```
+
+| Attribute | Default | Description                          |
+| --------- | ------- | ------------------------------------ |
+| `speed`   | `900`   | Animation speed in pixels per second |
+
 ## Customization
 
-Customize the animation with CSS custom properties:
+Customize the animation easing with CSS custom properties:
 
 ```css
 collapsible-content {
-  --collapsible-duration: 0.5s;
-  --collapsible-easing: ease-in-out;
+	--collapsible-easing: ease-in-out;
 }
 ```
 
-| Property | Default | Description |
-|----------|---------|-------------|
-| `--collapsible-duration` | `0.35s` | Animation duration |
-| `--collapsible-easing` | `ease-out` | Animation timing function |
+| Property                 | Default    | Description                                          |
+| ------------------------ | ---------- | ---------------------------------------------------- |
+| `--collapsible-duration` | dynamic    | Calculated from content height and `speed` attribute |
+| `--collapsible-easing`   | `ease`     | Animation timing function                            |
 
 ## Events
 
@@ -80,7 +100,7 @@ Fired when the component is missing required children:
 
 ```javascript
 document.addEventListener('collapsible-error', (e) => {
-  console.error('Collapsible setup failed:', e.detail.error);
+	console.error('Collapsible setup failed:', e.detail.error);
 });
 ```
 
@@ -90,7 +110,7 @@ Access the `collapsed` property on the `<collapsible-content>` element:
 
 ```javascript
 const content = document.querySelector('collapsible-content');
-content.collapsed = true;  // collapse
+content.collapsed = true; // collapse
 content.collapsed = false; // expand
 console.log(content.collapsed); // get current state
 ```
