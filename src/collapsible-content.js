@@ -58,14 +58,23 @@ class CollapsibleComponent extends HTMLElement {
 		_.content.id ||= `collapsible-content-${crypto.randomUUID().slice(0, 8)}`;
 
 		// set accessibility attributes
-		_.button.type ||= 'button';
+		if (!_.button.hasAttribute('type')) {
+			_.button.type = 'button';
+		}
 		_.button.setAttribute('aria-controls', _.content.id);
 		_.content.setAttribute('aria-labelledby', _.button.id);
 
-		// set initial state based on open attribute
+		// set initial state without triggering an opening/closing animation
 		const open = _.content.hasAttribute('open');
 		_.button.setAttribute('aria-expanded', open);
-		_.content.collapsed = !open;
+		_.content.style.height = open ? 'auto' : '0px';
+		if (open) {
+			_.content.removeAttribute('aria-hidden');
+			_.content.removeAttribute('inert');
+		} else {
+			_.content.setAttribute('aria-hidden', 'true');
+			_.content.setAttribute('inert', '');
+		}
 
 		// use AbortController to prevent duplicate listeners on reconnection
 		_.#abortController = new AbortController();
@@ -149,14 +158,25 @@ class CollapsibleContent extends HTMLElement {
 	 */
 	set collapsed(value) {
 		const _ = this;
+		const collapsed = Boolean(value);
 
 		// prevent rapid clicking during animation
 		if (_.#animating) return;
+		if (_.collapsed === collapsed) return;
 
 		// check if transitions are enabled (respects prefers-reduced-motion)
 		const hasTransition = getComputedStyle(_).transitionDuration !== '0s';
 
-		if (value) {
+		if (collapsed) {
+			_.removeAttribute('open');
+			_.setAttribute('aria-hidden', 'true');
+			_.setAttribute('inert', '');
+
+			if (!hasTransition) {
+				_.style.height = '0px';
+				return;
+			}
+
 			if (hasTransition) {
 				_.#animating = true;
 			}
@@ -170,22 +190,18 @@ class CollapsibleContent extends HTMLElement {
 					_.style.height = '0px';
 				});
 			});
-
-			_.removeAttribute('open');
-			_.setAttribute('aria-hidden', 'true');
-			_.setAttribute('inert', '');
 		} else {
-			// only animate if not already auto
-			if (_.style.height !== 'auto') {
-				if (hasTransition) {
-					_.#animating = true;
-				}
-				_.style.height = `${_.scrollHeight}px`;
-			}
-
 			_.setAttribute('open', '');
 			_.removeAttribute('aria-hidden');
 			_.removeAttribute('inert');
+
+			if (!hasTransition) {
+				_.style.height = 'auto';
+				return;
+			}
+
+			_.#animating = true;
+			_.style.height = `${_.scrollHeight}px`;
 		}
 	}
 
