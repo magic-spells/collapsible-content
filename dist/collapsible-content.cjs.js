@@ -2,7 +2,7 @@
 
 const DEFAULT_SPEED = 900; // px per second
 const MIN_DURATION = 0.25; // seconds
-const MAX_DURATION = 1.0; // seconds
+const MAX_DURATION = 0.8; // seconds
 
 /**
  * Custom element that creates a collapsible/expandable component with proper accessibility

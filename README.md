@@ -60,7 +60,7 @@ Add the `open` attribute to start with content visible:
 
 Animation duration scales dynamically with content height using a px/sec speed model. Short panels animate quickly, tall panels take proportionally longer — no fixed duration that feels too slow or too fast.
 
-The default speed is `900` px/sec. Duration is clamped between 250ms and 1s so animations always feel responsive. Tune it with the `speed`, `min-duration`, and `max-duration` attributes:
+The default speed is `900` px/sec. Duration is clamped between 250ms and 800ms so animations always feel responsive. Tune it with the `speed`, `min-duration`, and `max-duration` attributes:
 
 ```html
 <!-- Default: 900px/sec -->
@@ -80,7 +80,7 @@ The default speed is `900` px/sec. Duration is clamped between 250ms and 1s so a
 | -------------- | ------- | ------------------------------------------ |
 | `speed`        | `900`   | Animation speed in pixels per second       |
 | `min-duration` | `0.25`  | Minimum animation duration in seconds      |
-| `max-duration` | `1`     | Maximum animation duration in seconds      |
+| `max-duration` | `0.8`   | Maximum animation duration in seconds      |
 
 ## Accordion Groups
 
