@@ -18,13 +18,10 @@ class CollapsibleComponent extends HTMLElement {
 		_.button = null;
 		_.content = null;
 
-		// define click handler with proper this binding
-		_.#handleClick = (e) => {
-			e.preventDefault();
-			// toggle expanded value
-			const expanded = _.button.getAttribute('aria-expanded') !== 'true';
-			_.button.setAttribute('aria-expanded', expanded);
-			_.content.collapsed = !expanded;
+		// define click handler — content is source of truth
+		_.#handleClick = () => {
+			_.content.collapsed = !_.content.collapsed;
+			_.button.setAttribute('aria-expanded', !_.content.collapsed);
 		};
 	}
 
@@ -63,6 +60,9 @@ class CollapsibleComponent extends HTMLElement {
 		}
 		_.button.setAttribute('aria-controls', _.content.id);
 		_.content.setAttribute('aria-labelledby', _.button.id);
+		if (!_.content.hasAttribute('role')) {
+			_.content.setAttribute('role', 'region');
+		}
 
 		// set initial state without triggering an opening/closing animation
 		const open = _.content.hasAttribute('open');
@@ -113,7 +113,7 @@ class CollapsibleContent extends HTMLElement {
 
 		// define event handler using arrow function for proper binding
 		_.#handleTransitionEnd = (event) => {
-			// exit if isn't height property
+			if (event.target !== _) return;
 			if (event.propertyName !== 'height') return;
 
 			_.#animating = false;
@@ -146,6 +146,7 @@ class CollapsibleContent extends HTMLElement {
 	 */
 	disconnectedCallback() {
 		const _ = this;
+		_.#animating = false;
 		if (_.#abortController) {
 			_.#abortController.abort();
 			_.#abortController = null;
@@ -159,9 +160,6 @@ class CollapsibleContent extends HTMLElement {
 	set collapsed(value) {
 		const _ = this;
 		const collapsed = Boolean(value);
-
-		// prevent rapid clicking during animation
-		if (_.#animating) return;
 		if (_.collapsed === collapsed) return;
 
 		// check if transitions are enabled (respects prefers-reduced-motion)
@@ -177,19 +175,11 @@ class CollapsibleContent extends HTMLElement {
 				return;
 			}
 
-			if (hasTransition) {
-				_.#animating = true;
-			}
-
-			// animate to closed
-			_.style.height = `${_.scrollHeight}px`;
-
-			// use requestAnimationFrame for reliable frame timing
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					_.style.height = '0px';
-				});
-			});
+			// capture current height in px (converts auto or mid-animation value)
+			_.style.height = `${_.getBoundingClientRect().height}px`;
+			_.#animating = true;
+			_.offsetHeight; // force reflow — browser commits the px start value
+			_.style.height = '0px';
 		} else {
 			_.setAttribute('open', '');
 			_.removeAttribute('aria-hidden');
@@ -200,7 +190,10 @@ class CollapsibleContent extends HTMLElement {
 				return;
 			}
 
+			// capture current height in px (0px or mid-animation value)
+			_.style.height = `${_.getBoundingClientRect().height}px`;
 			_.#animating = true;
+			_.offsetHeight; // force reflow — browser commits the px start value
 			_.style.height = `${_.scrollHeight}px`;
 		}
 	}
