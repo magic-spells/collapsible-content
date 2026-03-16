@@ -6,6 +6,27 @@ const MAX_DURATION = 1.0; // seconds
  * Custom element that creates a collapsible/expandable component with proper accessibility
  */
 class CollapsibleComponent extends HTMLElement {
+	static #groups = new Map();
+
+	static #addToGroup(name, instance) {
+		if (!CollapsibleComponent.#groups.has(name)) {
+			CollapsibleComponent.#groups.set(name, new Set());
+		}
+		CollapsibleComponent.#groups.get(name).add(instance);
+	}
+
+	static #removeFromGroup(name, instance) {
+		const group = CollapsibleComponent.#groups.get(name);
+		if (group) {
+			group.delete(instance);
+			if (group.size === 0) CollapsibleComponent.#groups.delete(name);
+		}
+	}
+
+	static get observedAttributes() {
+		return ['group'];
+	}
+
 	#handleClick;
 	#abortController;
 
@@ -22,8 +43,10 @@ class CollapsibleComponent extends HTMLElement {
 
 		// define click handler — content is source of truth
 		_.#handleClick = () => {
-			_.content.collapsed = !_.content.collapsed;
+			const wasCollapsed = _.content.collapsed;
+			_.content.collapsed = !wasCollapsed;
 			_.button.setAttribute('aria-expanded', !_.content.collapsed);
+			if (wasCollapsed) _.#closeSiblings();
 		};
 	}
 
@@ -85,15 +108,38 @@ class CollapsibleComponent extends HTMLElement {
 		});
 	}
 
+	attributeChangedCallback(name, oldValue, newValue) {
+		if (name !== 'group') return;
+		if (oldValue) CollapsibleComponent.#removeFromGroup(oldValue, this);
+		if (newValue) CollapsibleComponent.#addToGroup(newValue, this);
+	}
+
 	/**
 	 * Called when element is removed from the DOM
 	 * Cleans up event listeners
 	 */
 	disconnectedCallback() {
 		const _ = this;
+		const group = _.getAttribute('group');
+		if (group) CollapsibleComponent.#removeFromGroup(group, _);
 		if (_.#abortController) {
 			_.#abortController.abort();
 			_.#abortController = null;
+		}
+	}
+
+	#closeSiblings() {
+		const _ = this;
+		const groupName = _.getAttribute('group');
+		if (!groupName) return;
+		const group = CollapsibleComponent.#groups.get(groupName);
+		if (!group) return;
+		for (const sibling of group) {
+			if (sibling === _) continue;
+			if (!sibling.content.collapsed) {
+				sibling.content.collapsed = true;
+				sibling.button.setAttribute('aria-expanded', 'false');
+			}
 		}
 	}
 }

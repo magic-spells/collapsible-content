@@ -634,7 +634,68 @@
 					</div>
 				</section>
 
-				<!-- Initially Open -->
+				<!-- Accordion Group -->
+			<section class="example">
+				<h2>Accordion Group</h2>
+				<p>
+					Add a <code>group</code> attribute to <code>&lt;collapsible-component&gt;</code>
+					to create accordion behavior &mdash; opening one item automatically closes others
+					in the same group.
+				</p>
+				<div class="demo-surface">
+					<collapsible-component group="faq">
+						<button type="button">What is the group attribute?</button>
+						<collapsible-content>
+							<div class="content-wrapper">
+								<p>
+									The <code>group</code> attribute links collapsible components
+									together. When one opens, all others in the same group close
+									automatically &mdash; classic accordion behavior.
+								</p>
+							</div>
+						</collapsible-content>
+					</collapsible-component>
+
+					<collapsible-component group="faq">
+						<button type="button">Can all items be closed?</button>
+						<collapsible-content>
+							<div class="content-wrapper">
+								<p>
+									Yes. Clicking the open item closes it without forcing another
+									open. All items in a group can be collapsed at the same time.
+								</p>
+							</div>
+						</collapsible-content>
+					</collapsible-component>
+
+					<collapsible-component group="faq">
+						<button type="button">Does it work with animation?</button>
+						<collapsible-content open>
+							<div class="content-wrapper">
+								<p>
+									The closing and opening animations run simultaneously. Try
+									clicking between items &mdash; even mid-animation, everything
+									stays smooth.
+								</p>
+							</div>
+						</collapsible-content>
+					</collapsible-component>
+				</div>
+
+				<div class="code-block">
+					<code>&lt;<span class="hl-tag">collapsible-component</span> <span class="hl-attr">group</span>=<span class="hl-value">"faq"</span>&gt;
+  &lt;<span class="hl-tag">button</span> <span class="hl-attr">type</span>=<span class="hl-value">"button"</span>&gt;Question One&lt;/<span class="hl-tag">button</span>&gt;
+  &lt;<span class="hl-tag">collapsible-content</span>&gt;...&lt;/<span class="hl-tag">collapsible-content</span>&gt;
+&lt;/<span class="hl-tag">collapsible-component</span>&gt;
+
+&lt;<span class="hl-tag">collapsible-component</span> <span class="hl-attr">group</span>=<span class="hl-value">"faq"</span>&gt;
+  &lt;<span class="hl-tag">button</span> <span class="hl-attr">type</span>=<span class="hl-value">"button"</span>&gt;Question Two&lt;/<span class="hl-tag">button</span>&gt;
+  &lt;<span class="hl-tag">collapsible-content</span>&gt;...&lt;/<span class="hl-tag">collapsible-content</span>&gt;
+&lt;/<span class="hl-tag">collapsible-component</span>&gt;</code>
+				</div>
+			</section>
+
+			<!-- Initially Open -->
 				<section class="example">
 					<h2>Initially Open</h2>
 					<p>
