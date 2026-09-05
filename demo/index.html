@@ -695,6 +695,53 @@
 					</div>
 				</section>
 
+				<!-- Group Element -->
+				<section class="example">
+					<h2>Group Element</h2>
+					<p>
+						Wrap items in <code>&lt;collapsible-group exclusive&gt;</code> to get accordion
+						behavior without naming a group. Open the console to see
+						<code>collapsible:toggle</code> events.
+					</p>
+					<div class="demo-surface">
+						<collapsible-group exclusive>
+							<collapsible-component>
+								<button type="button">Shipping</button>
+								<collapsible-content>
+									<div class="content-wrapper">
+										<p>Orders ship within two business days.</p>
+									</div>
+								</collapsible-content>
+							</collapsible-component>
+
+							<collapsible-component>
+								<button type="button">Returns</button>
+								<collapsible-content>
+									<div class="content-wrapper">
+										<p>Thirty days, no questions asked.</p>
+									</div>
+								</collapsible-content>
+							</collapsible-component>
+
+							<collapsible-component>
+								<button type="button">Warranty</button>
+								<collapsible-content>
+									<div class="content-wrapper">
+										<p>Two years against manufacturing defects.</p>
+									</div>
+								</collapsible-content>
+							</collapsible-component>
+						</collapsible-group>
+					</div>
+
+					<div class="code-block">
+						<code>&lt;<span class="hl-tag">collapsible-group</span> <span class="hl-attr">exclusive</span>&gt;
+  &lt;<span class="hl-tag">collapsible-component</span>&gt;...&lt;/<span class="hl-tag">collapsible-component</span>&gt;
+  &lt;<span class="hl-tag">collapsible-component</span>&gt;...&lt;/<span class="hl-tag">collapsible-component</span>&gt;
+&lt;/<span class="hl-tag">collapsible-group</span>&gt;</code>
+					</div>
+				</section>
+
 				<!-- Initially Open -->
 				<section class="example">
 					<h2>Initially Open</h2>
@@ -1081,6 +1128,12 @@
 		</div>
 
 		<script>
+			// log every state change — fired once per actual toggle
+			document.addEventListener('collapsible:toggle', (e) => {
+				const label = e.target.querySelector('button')?.textContent.trim();
+				console.log('collapsible:toggle', { open: e.detail.open, label });
+			});
+
 			document.addEventListener('DOMContentLoaded', () => {
 				const installValue = document.querySelector('.install-value');
 				if (installValue) {
