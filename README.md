@@ -127,6 +127,8 @@ Items without a `group` attribute continue to work independently. All items in a
 </collapsible-group>
 ```
 
+An authored `open` is taken at face value on first connect — two items in an exclusive group that both start open both stay open, and no events fire. Exclusivity is enforced only on a real state change.
+
 Without `exclusive` the group is just a container and items stay independent. A component joins its *nearest* ancestor group, so nested groups do not interfere. An explicit `group="name"` always wins — such a component ignores any surrounding `<collapsible-group>`.
 
 | Attribute   | Element                     | Default | Description                                            |

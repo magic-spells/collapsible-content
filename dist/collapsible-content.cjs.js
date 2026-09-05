@@ -55,8 +55,12 @@ class CollapsibleComponent extends HTMLElement {
 	connectedCallback() {
 		const _ = this;
 
-		// join the nearest <collapsible-group> when no explicit group name is set
-		if (!_.hasAttribute('group')) _.#joinGroupElement();
+		// (re)join a group on every connect — a DOM move runs disconnect then connect,
+		// and attributeChangedCallback only fires on a real attribute change.
+		// Both registries are Sets, so re-adding on first connect is a no-op.
+		const name = _.#groupName;
+		if (name) _.#addToNamedGroup(name);
+		else _.#joinGroupElement();
 
 		// initialize element references once
 		_.button = _.querySelector('button');
@@ -113,17 +117,9 @@ class CollapsibleComponent extends HTMLElement {
 		if (name !== 'group') return;
 		const _ = this;
 
-		if (oldValue) {
-			const group = namedGroups.get(oldValue);
-			if (group) {
-				group.delete(_);
-				if (group.size === 0) namedGroups.delete(oldValue);
-			}
-		}
-		if (newValue) {
-			if (!namedGroups.has(newValue)) namedGroups.set(newValue, new Set());
-			namedGroups.get(newValue).add(_);
-		}
+		// an empty group="" counts as no name
+		if (oldValue) _.#removeFromNamedGroup(oldValue);
+		if (newValue) _.#addToNamedGroup(newValue);
 
 		// an explicit group name wins over any ancestor <collapsible-group>
 		if (!_.isConnected) return;
@@ -137,14 +133,8 @@ class CollapsibleComponent extends HTMLElement {
 	 */
 	disconnectedCallback() {
 		const _ = this;
-		const name = _.getAttribute('group');
-		if (name) {
-			const group = namedGroups.get(name);
-			if (group) {
-				group.delete(_);
-				if (group.size === 0) namedGroups.delete(name);
-			}
-		}
+		const name = _.#groupName;
+		if (name) _.#removeFromNamedGroup(name);
 		_.#leaveGroupElement();
 		if (_.#abortController) {
 			_.#abortController.abort();
@@ -200,6 +190,23 @@ class CollapsibleComponent extends HTMLElement {
 		);
 	}
 
+	/** Group name, with an empty group="" normalized to null */
+	get #groupName() {
+		return this.getAttribute('group') || null;
+	}
+
+	#addToNamedGroup(name) {
+		if (!namedGroups.has(name)) namedGroups.set(name, new Set());
+		namedGroups.get(name).add(this);
+	}
+
+	#removeFromNamedGroup(name) {
+		const group = namedGroups.get(name);
+		if (!group) return;
+		group.delete(this);
+		if (group.size === 0) namedGroups.delete(name);
+	}
+
 	#joinGroupElement() {
 		const _ = this;
 		const element = _.closest('collapsible-group');
@@ -218,7 +225,7 @@ class CollapsibleComponent extends HTMLElement {
 
 	#closeSiblings() {
 		const _ = this;
-		const name = _.getAttribute('group');
+		const name = _.#groupName;
 		let siblings = null;
 		if (name) siblings = namedGroups.get(name);
 		else if (_.#groupElement?.hasAttribute('exclusive'))
